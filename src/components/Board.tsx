@@ -3,14 +3,14 @@ import './Board.css'
 import { Square } from "./Square";
 
 export class Board extends React.Component {
-    renderSquare() {
-        return <Square />
+    renderSquare(file: number, rank: number) {
+        return <Square file={file} rank={rank} /> //'\u265C' for black knight
     }
 
-    renderRow() {
+    renderRow(rank: number) {
         const row = [];
         for (let i = 0; i < 8; i++) {
-            row.push(this.renderSquare());
+            row.push(this.renderSquare(i, rank));
         }
         return (
             <div className="board-row">
@@ -22,7 +22,7 @@ export class Board extends React.Component {
     render() {
         const rows = [];
         for (let i = 0; i < 8; i++) {
-            rows.push(this.renderRow());
+            rows.unshift(this.renderRow(i));
         }
 
         return (
