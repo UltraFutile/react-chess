@@ -2,10 +2,11 @@
     border: 7px solid #633b3b;
     margin-left: 100px;
     margin-top: 100px;
+    display: inline-grid;
 }
 
 .board-row {
-    width: fit-content;
+    display: inline-block;
 }
 
 .board-row:after {

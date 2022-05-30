@@ -15,7 +15,7 @@ export const Board = () => {
     const [boardState, setBoardState] = React.useState<BoardState>(new BoardState(8, 8));
 
     const onSquareClick = (file: number, rank: number) => {
-        console.log(`FILE: ${file}, RANK: ${rank}`)
+        console.log(`FILE: ${file}, RANK: ${rank}`);
     };
 
     const renderSquare = (file: number, rank: number, color: string) => {
