@@ -11,7 +11,7 @@ import { Team } from "../../lib/Team";
 const filterCss = "drop-shadow(2px 2px 5px rgb(0 0 0 / 0.4))";
 
 function getPieceColor(team: Team) {
-    return team === Team.White ? "#FFFFF0" : "#5C5D54";
+    return team === Team.White ? "#FFFFF0" : "#342C25"; // ivory and cola
 }
 
 export const King = (props: { team: Team }) => 

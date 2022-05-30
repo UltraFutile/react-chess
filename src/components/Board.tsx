@@ -19,6 +19,13 @@ export const Board = () => {
 
     const onSquareClick = (file: number, rank: number) => {
         console.log(`FILE: ${file}, RANK: ${rank}`);
+        const square = boardState.getSquare(file, rank);
+        if (square.piece) {
+            console.log(`Has piece ${square.piece.piece}, for team ${square.piece.team.toString()}`)
+        }
+        else {
+            console.log("No piece on square");
+        }
     };
 
     const renderSquare = (file: number, rank: number, color: string, piece?: PieceProps) => {
