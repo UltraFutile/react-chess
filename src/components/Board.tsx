@@ -1,4 +1,7 @@
 import React from 'react';
+import { BoardState } from '../lib/model/BoardState';
+import { PieceProps } from '../lib/model/PieceProps';
+import { SquareState } from '../lib/model/SquareState';
 import './Board.css'
 import { Square } from "./Square";
 
@@ -18,12 +21,13 @@ export const Board = () => {
         console.log(`FILE: ${file}, RANK: ${rank}`);
     };
 
-    const renderSquare = (file: number, rank: number, color: string) => {
+    const renderSquare = (file: number, rank: number, color: string, piece?: PieceProps) => {
         return <Square 
             key={`${file}${rank}`} 
             file={file} 
             rank={rank} 
             color={color} 
+            piece={piece}
             onClick={onSquareClick}
             
         />; //'\u265C' for black knight
@@ -35,7 +39,7 @@ export const Board = () => {
             const row = [];
             for (let j = 0; j < boardState.rankNum; j++) {
                 let squareState: SquareState = boardState.getSquare(i, j);
-                row.push(renderSquare(squareState.file, squareState.rank, squareState.color));
+                row.push(renderSquare(squareState.file, squareState.rank, squareState.color, squareState.piece));
             }
             rows.unshift(
                 <div key={i} className="board-row">
@@ -53,43 +57,3 @@ export const Board = () => {
     );
 }
 
-interface SquareState {
-    color: string;
-    file: number;
-    rank: number;
-}
-
-class BoardState {
-    private squareArray: SquareState[][];
-    public fileNum: number;
-    public rankNum: number;
-
-    constructor(fileNum: number = 8, rankNum: number = 8) {
-        this.squareArray = this.initializeSquares(fileNum, rankNum);
-        this.fileNum = fileNum;
-        this.rankNum = rankNum;
-    }
-
-    initializeSquares(fileNum: number, rankNum: number) {
-        const rows = [];
-        for (let i = 0; i < fileNum; i++) {
-            let row: SquareState[] = [];
-            let colorIn: boolean = i % 2 === 0;
-            for (let j = 0; j < rankNum; j++) {
-                row.push({
-                    color:  colorIn ? '#BA8C63' : '#FFFAF0',
-                    file: i,
-                    rank: j
-                });
-                colorIn = !colorIn;
-            }
-            rows.push(row);
-        }
-    
-        return rows;
-    }
-
-    getSquare(file: number, rank: number) {
-        return this.squareArray[file][rank];
-    }
-}

@@ -1,23 +1,48 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChessKing, faChessKnight } from '@fortawesome/free-solid-svg-icons'
-// import { faChessKing as regularKing } from '@fortawesome/free-regular-svg-icons'
-
 import './Square.css'
+import { Bishop, King, Knight, Pawn, Queen, Rook } from './pieces/Pieces';
+import { PieceProps } from '../lib/model/PieceProps';
 
-export const Square = (props: { file: number, rank: number, color: string, onClick: (file: number, rank: number) => void}) => {
+type Props = {
+    file: number
+    rank: number 
+    color: string
+    piece?: PieceProps
+    onClick: (file: number, rank: number) => void
+}
+
+export const Square = (props: Props) => {
     const FILE_CHAR_STRING = "ABCDEFGH";
     const buttonStyle = {
         backgroundColor: props.color
     };
     return (
         <button className="square" style={buttonStyle} onClick={() => props.onClick(props.file, props.rank)}>
-            {/* {'\u265C'} */}
             {/* {`${this.FILE_CHAR_STRING[this.props.file]}${this.props.rank + 1}`} */}
-            <FontAwesomeIcon icon={faChessKnight} style={{ 
-                color: "white",
-                filter: "drop-shadow(2px 2px 5px rgb(0 0 0 / 0.4))"
-            }}/>
+            
             {/* {`${props.file}${props.rank}`} */}
+            {getPieceComponent(props.piece)}
         </button>
     );
+}
+
+function getPieceComponent(piece?: PieceProps) {
+    if (piece) {
+        switch(piece.piece) {
+            case "king":
+                return <King team={piece.team}></King>;
+            case "queen":
+                return <Queen team={piece.team}></Queen>;
+            case "bishop":
+                return <Bishop team={piece.team}></Bishop>;
+            case "knight":
+                return <Knight team={piece.team}></Knight>;
+            case "rook":
+                return <Rook team={piece.team}></Rook>;
+            case "pawn":
+                return <Pawn team={piece.team}></Pawn>;
+            default:
+                throw new Error("piece does not exist");
+        }
+        
+    }
 }
