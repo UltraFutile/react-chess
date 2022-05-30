@@ -5,4 +5,5 @@ export interface SquareState {
     file: number;
     rank: number;
     piece?: PieceProps;
+    selected: boolean;
 }
