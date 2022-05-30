@@ -1,5 +1,6 @@
 import React from 'react';
 import { BoardState, BoardStateFactory } from '../lib/model/BoardState';
+import { PieceProps } from '../lib/model/PieceProps';
 import { SquareState } from '../lib/model/SquareState';
 import './Board.css'
 import { Square } from "./Square";
@@ -30,17 +31,40 @@ export const Board = () => {
             console.log("No piece on square");
         }
 
+        // If square is already selected, simply unselect.
         if (clickedSquare.selected) {
             clickedSquare.selected = false;
-            newState.selected = null;
+            newState.selectedSquare = null;
         }
-        else {
-            if (newState.selected) {
-                newState.squareGrid[newState.selected[0]][newState.selected[1]].selected = false;
-            }    
+        else { // selecting different square
+            if (newState.selectedSquare) { // If previously selected square
+                let prevSelectedSquare = newState.squareGrid[newState.selectedSquare[0]][newState.selectedSquare[1]];
+                if (prevSelectedSquare.piece) { // moving a piece
+                    // remove piece from previously selected square
+                    let piece = prevSelectedSquare.piece.piece;
+                    let team = prevSelectedSquare.piece.team;
 
-            clickedSquare.selected = true;
-            newState.selected = [file, rank];          
+                    prevSelectedSquare.piece = undefined;
+
+                    // add this piece to the next selected square
+                    clickedSquare.piece = {
+                        piece : piece,
+                        team: team
+                    }
+                    clickedSquare.selected = false;
+                    newState.selectedSquare = undefined;
+                }
+                else {
+                    clickedSquare.selected = true;
+                    newState.selectedSquare = [file, rank];
+                }                
+                
+                prevSelectedSquare.selected = false;
+            }
+            else {
+                clickedSquare.selected = true;
+                newState.selectedSquare = [file, rank];
+            }
         }
 
         setBoardState(newState);
