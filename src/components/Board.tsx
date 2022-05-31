@@ -18,9 +18,22 @@ export const Board = () => {
 
     const [boardState, setBoardState] = React.useState<BoardState>(boardStateFactory.createBoardState());
 
+    const unselectSquare = (state: BoardState, file: number, rank: number): BoardState => {
+        const square: SquareState = state.squareGrid[file][rank];
+        square.selected = false;
+        state.selectedSquare = undefined;
+        return state;
+    }
+
+    const selectNewSquare = (state: BoardState, file: number, rank: number): BoardState => {
+        const square: SquareState = state.squareGrid[file][rank];
+        square.selected = true;
+        state.selectedSquare = [file, rank];
+        return state;
+    }
+
     const onSquareClick = (file: number, rank: number) => {
-        const newState: BoardState = {...boardState};
-        const clickedSquare: SquareState = newState.squareGrid[file][rank];
+        const clickedSquare: SquareState = boardState.squareGrid[file][rank];
 
         console.log(`FILE: ${file}, RANK: ${rank}`);
         if (clickedSquare.piece) {
@@ -32,24 +45,17 @@ export const Board = () => {
 
         // If you have not previously selected a piece,
         // and the square you clicked has no piece, nothing should happen
-        if (newState.selectedSquare == null && clickedSquare.piece == null) {
+        if (boardState.selectedSquare == null && clickedSquare.piece == null)
             return;
-        }
+
+        const newState: BoardState = {...boardState};
 
         // If square is already selected, simply unselect.
-        if (clickedSquare.selected) {
-            clickedSquare.selected = false;
-            newState.selectedSquare = undefined;
-            setBoardState(newState);
-            return;
-        }
+        if (clickedSquare.selected)
+            return unselectSquare(newState, file, rank);
 
-        if (newState.selectedSquare == null) {
-            clickedSquare.selected = true;
-            newState.selectedSquare = [file, rank];
-            setBoardState(newState);
-            return;
-        }
+        if (newState.selectedSquare == null)
+            return selectNewSquare(newState, file, rank);
 
         // Selecting different square
         // If previously selected square
