@@ -26,6 +26,11 @@ export const Board = () => {
     }
 
     const selectNewSquare = (state: BoardState, file: number, rank: number): BoardState => {
+        let previouslySelectedSquare = state.selectedSquare;
+        if (previouslySelectedSquare) {
+            previouslySelectedSquare.selected = false;
+        }
+
         const square: SquareState = state.squareGrid[file][rank];
         square.selected = true;
         state.selectedSquare = square;
@@ -57,36 +62,34 @@ export const Board = () => {
             return;
         }
 
-        console.log(newState.selectedSquare)
-        if (newState.selectedSquare == undefined) {
+        // If there is no currently selected square, select this one
+        if (newState.selectedSquare == null) {
             setBoardState(selectNewSquare(newState, file, rank));
             return;
-        }            
-
-        // Selecting different square
-        // If previously selected square
-        let prevSelectedSquare = newState.selectedSquare;
-        if (prevSelectedSquare.piece) { // moving a piece
-            // remove piece from previously selected square
-            let piece = prevSelectedSquare.piece.piece;
-            let team = prevSelectedSquare.piece.team;
-
-            prevSelectedSquare.piece = undefined;
-
-            // add this piece to the next selected square
-            clickedSquare.piece = {
-                piece : piece,
-                team: team
-            };
-
-            clickedSquare.selected = false;
-            newState.selectedSquare = undefined;
         }
-        else {
-            clickedSquare.selected = true;
-            newState.selectedSquare = clickedSquare;
-        }                
         
+        // Selecting different square from previously selected square
+        let prevSelectedSquare = newState.selectedSquare;
+        if (prevSelectedSquare.piece == null) {
+            setBoardState(selectNewSquare(newState, file, rank));
+            return;
+        }
+
+        // moving a piece
+        // remove piece from previously selected square
+        let piece = prevSelectedSquare.piece.piece;
+        let team = prevSelectedSquare.piece.team;
+
+        prevSelectedSquare.piece = undefined;
+
+        // add this piece to the next selected square
+        clickedSquare.piece = {
+            piece : piece,
+            team: team
+        };
+
+        clickedSquare.selected = false;
+        newState.selectedSquare = undefined;
         prevSelectedSquare.selected = false;
 
         setBoardState(newState);
