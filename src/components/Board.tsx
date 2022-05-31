@@ -28,7 +28,8 @@ export const Board = () => {
     const selectNewSquare = (state: BoardState, file: number, rank: number): BoardState => {
         const square: SquareState = state.squareGrid[file][rank];
         square.selected = true;
-        state.selectedSquare = [file, rank];
+        state.selectedSquare = square;
+        console.log(square);
         return state;
     }
 
@@ -51,15 +52,20 @@ export const Board = () => {
         const newState: BoardState = {...boardState};
 
         // If square is already selected, simply unselect.
-        if (clickedSquare.selected)
-            return unselectSquare(newState, file, rank);
+        if (clickedSquare.selected) {
+            setBoardState(unselectSquare(newState, file, rank));
+            return;
+        }
 
-        if (newState.selectedSquare == null)
-            return selectNewSquare(newState, file, rank);
+        console.log(newState.selectedSquare)
+        if (newState.selectedSquare == undefined) {
+            setBoardState(selectNewSquare(newState, file, rank));
+            return;
+        }            
 
         // Selecting different square
         // If previously selected square
-        let prevSelectedSquare = newState.squareGrid[newState.selectedSquare[0]][newState.selectedSquare[1]];
+        let prevSelectedSquare = newState.selectedSquare;
         if (prevSelectedSquare.piece) { // moving a piece
             // remove piece from previously selected square
             let piece = prevSelectedSquare.piece.piece;
@@ -78,7 +84,7 @@ export const Board = () => {
         }
         else {
             clickedSquare.selected = true;
-            newState.selectedSquare = [file, rank];
+            newState.selectedSquare = clickedSquare;
         }                
         
         prevSelectedSquare.selected = false;
