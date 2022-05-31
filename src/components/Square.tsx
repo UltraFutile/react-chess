@@ -12,16 +12,12 @@ type Props = {
 }
 
 export const Square = (props: Props) => {
-    const FILE_CHAR_STRING = "ABCDEFGH";
     const buttonStyle = {
         backgroundColor: props.selected ? "#0082AD" : props.color
     };
     
     return (
         <button className="square" style={buttonStyle} onClick={() => props.onClick(props.file, props.rank)}>
-            {/* {`${this.FILE_CHAR_STRING[this.props.file]}${this.props.rank + 1}`} */}
-            
-            {/* {`${props.file}${props.rank}`} */}
             {getPieceComponent(props.piece)}
         </button>
     );
