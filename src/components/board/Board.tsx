@@ -1,8 +1,8 @@
 import React from 'react';
-import { BoardState, BoardStateFactory } from '../lib/model/BoardState';
-import { SquareState } from '../lib/model/SquareState';
+import { BoardState, BoardStateFactory } from '../../lib/model/BoardState';
+import { SquareState } from '../../lib/model/SquareState';
+import { Square } from '../Square';
 import './Board.css'
-import { Square } from "./Square";
 
 /**
  * Should maintain state of:
@@ -35,6 +35,32 @@ export const Board = () => {
         square.selected = true;
         state.selectedSquare = square;
         console.log(square);
+        return state;
+    }
+
+    const movePiece = (state: BoardState, file: number, rank: number) => {
+        let prevSelectedSquare = state.selectedSquare;
+        if (prevSelectedSquare == null || prevSelectedSquare.piece == null) {
+            throw new Error("Attempted to move piece without selecting one");
+        }
+
+        // moving a piece
+        // remove piece from previously selected square
+        let piece = prevSelectedSquare.piece.piece;
+        let team = prevSelectedSquare.piece.team;
+
+        prevSelectedSquare.piece = undefined;
+
+        const square: SquareState = state.squareGrid[file][rank];
+        // add this piece to the next selected square
+        square.piece = {
+            piece : piece,
+            team: team
+        };
+
+        square.selected = false;
+        state.selectedSquare = undefined;
+        prevSelectedSquare.selected = false;
         return state;
     }
 
@@ -75,24 +101,7 @@ export const Board = () => {
             return;
         }
 
-        // moving a piece
-        // remove piece from previously selected square
-        let piece = prevSelectedSquare.piece.piece;
-        let team = prevSelectedSquare.piece.team;
-
-        prevSelectedSquare.piece = undefined;
-
-        // add this piece to the next selected square
-        clickedSquare.piece = {
-            piece : piece,
-            team: team
-        };
-
-        clickedSquare.selected = false;
-        newState.selectedSquare = undefined;
-        prevSelectedSquare.selected = false;
-
-        setBoardState(newState);
+        setBoardState(movePiece(newState, file, rank));
     };
 
     const renderSquare = (squareState: SquareState) => {
