@@ -1,6 +1,5 @@
 import React from 'react';
 import { BoardState, BoardStateFactory } from '../lib/model/BoardState';
-import { PieceProps } from '../lib/model/PieceProps';
 import { SquareState } from '../lib/model/SquareState';
 import './Board.css'
 import { Square } from "./Square";
@@ -29,6 +28,12 @@ export const Board = () => {
         }
         else {
             console.log("No piece on square");
+        }
+
+        // If you have not previously selected a piece,
+        // and the square you clicked has no piece, nothing should happen
+        if (newState.selectedSquare == null && clickedSquare.piece == null) {
+            return;
         }
 
         // If square is already selected, simply unselect.
