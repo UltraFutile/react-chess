@@ -84,24 +84,18 @@ export const Board = () => {
 
         // If square is already selected, simply unselect.
         if (clickedSquare.selected) {
-            setBoardState(unselectSquare(newState, file, rank));
-            return;
+            unselectSquare(newState, file, rank);
         }
-
         // If there is no currently selected square, select this one
-        if (newState.selectedSquare == null) {
-            setBoardState(selectNewSquare(newState, file, rank));
-            return;
+        // OR if selecting different square from previously selected square
+        else if (newState.selectedSquare == null || newState.selectedSquare.piece == null) {
+            selectNewSquare(newState, file, rank);
         }
-        
-        // Selecting different square from previously selected square
-        let prevSelectedSquare = newState.selectedSquare;
-        if (prevSelectedSquare.piece == null) {
-            setBoardState(selectNewSquare(newState, file, rank));
-            return;
+        else {
+            movePiece(newState, file, rank);
         }
 
-        setBoardState(movePiece(newState, file, rank));
+        setBoardState(newState);
     };
 
     const renderSquare = (squareState: SquareState) => {
