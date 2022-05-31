@@ -39,38 +39,43 @@ export const Board = () => {
         // If square is already selected, simply unselect.
         if (clickedSquare.selected) {
             clickedSquare.selected = false;
-            newState.selectedSquare = null;
+            newState.selectedSquare = undefined;
+            setBoardState(newState);
+            return;
         }
-        else { // selecting different square
-            if (newState.selectedSquare) { // If previously selected square
-                let prevSelectedSquare = newState.squareGrid[newState.selectedSquare[0]][newState.selectedSquare[1]];
-                if (prevSelectedSquare.piece) { // moving a piece
-                    // remove piece from previously selected square
-                    let piece = prevSelectedSquare.piece.piece;
-                    let team = prevSelectedSquare.piece.team;
 
-                    prevSelectedSquare.piece = undefined;
-
-                    // add this piece to the next selected square
-                    clickedSquare.piece = {
-                        piece : piece,
-                        team: team
-                    }
-                    clickedSquare.selected = false;
-                    newState.selectedSquare = undefined;
-                }
-                else {
-                    clickedSquare.selected = true;
-                    newState.selectedSquare = [file, rank];
-                }                
-                
-                prevSelectedSquare.selected = false;
-            }
-            else {
-                clickedSquare.selected = true;
-                newState.selectedSquare = [file, rank];
-            }
+        if (newState.selectedSquare == null) {
+            clickedSquare.selected = true;
+            newState.selectedSquare = [file, rank];
+            setBoardState(newState);
+            return;
         }
+
+        // Selecting different square
+        // If previously selected square
+        let prevSelectedSquare = newState.squareGrid[newState.selectedSquare[0]][newState.selectedSquare[1]];
+        if (prevSelectedSquare.piece) { // moving a piece
+            // remove piece from previously selected square
+            let piece = prevSelectedSquare.piece.piece;
+            let team = prevSelectedSquare.piece.team;
+
+            prevSelectedSquare.piece = undefined;
+
+            // add this piece to the next selected square
+            clickedSquare.piece = {
+                piece : piece,
+                team: team
+            };
+
+            clickedSquare.selected = false;
+            newState.selectedSquare = undefined;
+        }
+        else {
+            clickedSquare.selected = true;
+            newState.selectedSquare = [file, rank];
+        }                
+        
+        prevSelectedSquare.selected = false;
 
         setBoardState(newState);
     };
@@ -85,7 +90,7 @@ export const Board = () => {
             selected={squareState.selected}
             onClick={onSquareClick}
             
-        />; //'\u265C' for black knight
+        />;
     }
 
     const renderSquares = () => {

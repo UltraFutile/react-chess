@@ -5,7 +5,7 @@ export interface BoardState {
     fileNum: number;
     rankNum: number;
     squareGrid: SquareState[][];
-    selectedSquare?: [number, number] | null;
+    selectedSquare?: [number, number];
 }
 
 export class BoardStateFactory {
