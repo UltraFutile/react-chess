@@ -11,13 +11,15 @@ type Props = {
     onClick: (file: number, rank: number) => void
 }
 
+const fileCharStr = "ABCDEFGH";
+
 export const Square = (props: Props) => {
     const buttonStyle = {
         backgroundColor: props.selected ? "#0082AD" : props.color
     };
     
     return (
-        <button className="square" style={buttonStyle} onClick={() => props.onClick(props.file, props.rank)}>
+        <button className="square" style={buttonStyle} onClick={() => props.onClick(props.file, props.rank)} title={`${fileCharStr[props.file]}${props.rank + 1}`}>
             {getPieceComponent(props.piece)}
         </button>
     );

@@ -49,7 +49,7 @@ export const Board = () => {
                 let squareState: SquareState = state.squareGrid[i][j];
                 row.push(renderSquare(squareState));
             }
-            rows.unshift(
+            rows.push(
                 <div key={i} className="board-row">
                     {row}
                 </div>

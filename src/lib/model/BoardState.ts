@@ -53,80 +53,80 @@ export class BoardStateFactory {
             piece: 'rook'
         }
 
-        squareArray[0][1].piece = {
+        squareArray[1][0].piece = {
             team: Team.White,
             piece: 'knight'
         }
 
-        squareArray[0][2].piece = {
+        squareArray[2][0].piece = {
             team: Team.White,
             piece: 'bishop'
         }
 
-        squareArray[0][3].piece = {
+        squareArray[3][0].piece = {
             team: Team.White,
             piece: 'queen'
         }
 
-        squareArray[0][4].piece = {
+        squareArray[4][0].piece = {
             team: Team.White,
             piece: 'king'
         }
 
-        squareArray[0][5].piece = {
+        squareArray[5][0].piece = {
             team: Team.White,
             piece: 'bishop'
         }
 
-        squareArray[0][6].piece = {
+        squareArray[6][0].piece = {
             team: Team.White,
             piece: 'knight'
         }
 
-        squareArray[0][7].piece = {
+        squareArray[7][0].piece = {
             team: Team.White,
             piece: 'rook'
         }
 
         for (let i = 0; i < 8; i++) {
-            squareArray[1][i].piece = {
+            squareArray[i][1].piece = {
                 team: Team.White,
                 piece: 'pawn'
             }
         }
 
         // Black pieces
-        squareArray[7][0].piece = {
+        squareArray[0][7].piece = {
             team: Team.Black,
             piece: 'rook'
         }
 
-        squareArray[7][1].piece = {
+        squareArray[1][7].piece = {
             team: Team.Black,
             piece: 'knight'
         }
 
-        squareArray[7][2].piece = {
+        squareArray[2][7].piece = {
             team: Team.Black,
             piece: 'bishop'
         }
 
-        squareArray[7][3].piece = {
+        squareArray[3][7].piece = {
             team: Team.Black,
             piece: 'queen'
         }
 
-        squareArray[7][4].piece = {
+        squareArray[4][7].piece = {
             team: Team.Black,
             piece: 'king'
         }
 
-        squareArray[7][5].piece = {
+        squareArray[5][7].piece = {
             team: Team.Black,
             piece: 'bishop'
         }
 
-        squareArray[7][6].piece = {
+        squareArray[6][7].piece = {
             team: Team.Black,
             piece: 'knight'
         }
@@ -137,7 +137,7 @@ export class BoardStateFactory {
         }
 
         for (let i = 0; i < 8; i++) {
-            squareArray[6][i].piece = {
+            squareArray[i][6].piece = {
                 team: Team.Black,
                 piece: 'pawn'
             }

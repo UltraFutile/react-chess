@@ -5,7 +5,9 @@ import { Board } from './components/board/Board';
 
 function App() {
   return (
-    <Board></Board>
+    <div className="align-container">
+      <Board></Board>
+    </div>
     // <div className="App">
     //   <header className="App-header">
     //     <img src={logo} className="App-logo" alt="logo" />
