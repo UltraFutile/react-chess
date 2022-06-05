@@ -2,6 +2,7 @@ import { BoardRank, Coordinates } from "../../types/AlgebraicNotation";
 import { BoardState, getDestination, getMovement, getSquare } from "../model/BoardState";
 import { SquareState } from "../model/SquareState";
 import { Team } from "../Team";
+import { destinationHasSameTeam } from "./PieceHelpers";
 
 const MAX_PAWN_VERTICAL_RANGE: number = 2;
 const WHITE_PAWN_START_RANK: BoardRank = 2;
@@ -58,10 +59,6 @@ export function isLegalPawnMove(boardState: BoardState, orig: Coordinates, dest:
 const isMovingInWrongDirection = (team: Team, rankMovement: number) => {
     return ((team === Team.White && !(rankMovement > 0))
     || (team === Team.Black && !(rankMovement < 0)));
-}
-
-const destinationHasSameTeam = (origTeam: Team, dest: SquareState) => {
-    return dest.piece && dest.piece.team === origTeam;
 }
 
 const destinationHasEnemyTeam = (origTeam: Team, dest: SquareState) => {

@@ -7,6 +7,7 @@ export interface BoardState {
     rankNum: number;
     squareGrid: SquareState[][];
     currentlySelectedSquare?: SquareState;
+    whichTeamsTurn: Team;
 }
 
 const fileToIndexMap: Record<BoardFile, number> = {
@@ -19,7 +20,7 @@ const indexToFileMap: Record<number, BoardFile> = {
 const fileToIndex = (file: BoardFile): number => fileToIndexMap[file];
 const indexToFile = (index: number): BoardFile => indexToFileMap[index];
 const rankToIndex = (rank: BoardRank): number => rank - 1;
-const indexToRank = (index: number): BoardRank => index + 1 as BoardRank;
+const indexToRank = (index: number): BoardRank => (index + 1) as BoardRank;
 
 
 export function getMovement(orig: Coordinates, dest: Coordinates) : [number, number] {
@@ -72,14 +73,14 @@ export class BoardStateFactory {
         return {
             fileNum,
             rankNum,
-            squareGrid
+            squareGrid,
+            whichTeamsTurn: Team.White
         }
     }
 
     private createSquareGrid(fileNum: number, rankNum: number): SquareState[][] {
         let squareArray: SquareState[][];
         squareArray = this.initializeSquares(fileNum, rankNum);
-        this.setBoardPieces(squareArray);
         return squareArray;
     }
 

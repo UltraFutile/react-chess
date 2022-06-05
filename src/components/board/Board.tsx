@@ -33,7 +33,9 @@ export const Board = () => {
             newState = unselectSquare(state, file, rank);
         }
         else if (state.currentlySelectedSquare == null || state.currentlySelectedSquare.piece == null) {
-            newState = selectNewSquare(state, file, rank);
+            if (state.whichTeamsTurn === clickedSquare.piece?.team) {
+                newState = selectNewSquare(state, file, rank);
+            }
         }
         else {
             if (validateMove(state, file, rank)) {

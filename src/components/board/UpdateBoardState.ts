@@ -1,6 +1,7 @@
 import { BoardState, getCoordinates } from "../../lib/model/BoardState";
 import { SquareState } from "../../lib/model/SquareState";
 import { isLegalPawnMove } from "../../lib/pieces/Pawn";
+import { Team } from "../../lib/Team";
 
 export function unselectSquare(state: BoardState, file: number, rank: number): BoardState {
     const newState: BoardState = {...state};
@@ -65,6 +66,9 @@ export function movePiece (state: BoardState, file: number, rank: number): Board
     nextSquare.selected = false;
     newState.currentlySelectedSquare = undefined;
     prevSelectedSquare.selected = false;
+
+    // Change whose turn it is
+    newState.whichTeamsTurn = newState.whichTeamsTurn === Team.White ? Team.Black : Team.White;
 
     return newState;
 }
