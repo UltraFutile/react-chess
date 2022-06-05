@@ -63,6 +63,10 @@ describe.each([
         it("can't move three squares forward", () => {
             expect(isLegalPawnMove(state, origin, getDestination(state, origin, { rank: 3 * rankDirection}))).toBe(false);
         });
+
+        it("can't move normal capture position when no enemy at destination", () => {
+            expect(isLegalPawnMove(state, origin, getDestination(state, origin, { file: 1, rank: 1 * rankDirection}))).toBe(false);
+        });
     
         it("can't move to a square on the same rank", () => {
             expect(isLegalPawnMove(state, origin, getDestination(state, origin, { file: 1 }))).toBe(false);

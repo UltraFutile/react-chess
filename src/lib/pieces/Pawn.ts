@@ -3,6 +3,10 @@ import { BoardState, getDestination, getMovement, getSquare } from "../model/Boa
 import { SquareState } from "../model/SquareState";
 import { Team } from "../Team";
 
+const MAX_PAWN_VERTICAL_RANGE: number = 2;
+const WHITE_PAWN_START_RANK: BoardRank = 2;
+const BLACK_PAWN_START_RANK: BoardRank = 7;
+
 export function isLegalPawnMove(boardState: BoardState, orig: Coordinates, dest: Coordinates): boolean {
     const origin: SquareState = getSquare(boardState, orig);
     const destination: SquareState = getSquare(boardState, dest);
@@ -13,44 +17,36 @@ export function isLegalPawnMove(boardState: BoardState, orig: Coordinates, dest:
 
     const originTeam: Team = origin.piece.team;
     const rankDirection: number = originTeam === Team.White ? 1 : -1;
-    const startingRank: BoardRank = originTeam === Team.White ? 2 : 7;
+    const startingRank: BoardRank = originTeam === Team.White ? WHITE_PAWN_START_RANK : BLACK_PAWN_START_RANK;
 
     const [fileMovement, rankMovement] = getMovement(orig, dest);
 
     if (isMovingInWrongDirection(originTeam, rankMovement))
         return false;
 
-    // Get pawn vertical range
     const rankMagnitude: number = Math.abs(rankMovement);
 
-    if (rankMagnitude > 2)
+    if (rankMagnitude > MAX_PAWN_VERTICAL_RANGE)
         return false;
 
-    // Can't capture same team
     if (destinationHasSameTeam(originTeam, destination))
         return false;
 
     if (origin.file !== destination.file) {
-        // It must be by one
-        if (Math.abs(fileMovement) > 1)
+        if (Math.abs(fileMovement) > 1 || rankMagnitude !== 1)
             return false;
 
-        // Must travel by one vertical space
-        // There must be an enemy piece
+        if (!destinationHasEnemyTeam(originTeam, destination))
+            return false;
     }
     else {
-        if (rankMagnitude === 2 && (orig[1] !== startingRank || destination.piece))
+        if (rankMagnitude === MAX_PAWN_VERTICAL_RANGE && (orig[1] !== startingRank || destination.piece))
             return false;
             
         // if there's any piece in front of pawn, move is illegal
         const immediateSquare = getSquare(boardState, getDestination(boardState, orig, { rank: 1 * rankDirection }));
         if (immediateSquare.piece)
             return false;
-    }
-
-    if (destinationHasEnemyTeam(originTeam, destination)) {
-        // if pawn's destination has an enemy,
-        // it can only move one diagonal forward        
     }
 
     return true;
