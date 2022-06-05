@@ -19,7 +19,11 @@ export const Square = (props: Props) => {
     };
     
     return (
-        <button className="square" style={buttonStyle} onClick={() => props.onClick(props.file, props.rank)} title={`${fileCharStr[props.file]}${props.rank + 1}`}>
+        <button 
+            className="square" 
+            style={buttonStyle} 
+            onClick={() => props.onClick(props.file, props.rank)} 
+            title={`${fileCharStr[props.file]}${props.rank + 1} (${props.file}, ${props.rank})`}>
             {getPieceComponent(props.piece)}
         </button>
     );

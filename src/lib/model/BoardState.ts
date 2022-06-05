@@ -1,3 +1,4 @@
+import { BoardFile, BoardRank, Coordinates } from "../../types/AlgebraicNotation";
 import { Team } from "../Team";
 import { SquareState } from "./SquareState";
 
@@ -6,6 +7,16 @@ export interface BoardState {
     rankNum: number;
     squareGrid: SquareState[][];
     currentlySelectedSquare?: SquareState;
+}
+
+const fileToIndexMap: Record<BoardFile, number> = {
+    'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7
+}
+
+const rankToIndex = (rank: BoardRank) => rank - 1;
+
+export function getSquare(boardState: BoardState, coordinates: Coordinates): SquareState {
+    return boardState.squareGrid[fileToIndexMap[coordinates[0]]][rankToIndex(coordinates[1])];
 }
 
 export class BoardStateFactory {
