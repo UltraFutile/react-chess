@@ -2,7 +2,7 @@ import React from 'react';
 import { BoardState, BoardStateFactory } from '../../lib/model/BoardState';
 import { SquareState } from '../../lib/model/SquareState';
 import { Square } from '../Square';
-import { selectNewSquare, unselectSquare, updateBoardState } from './UpdateBoardState';
+import { selectNewSquare, unselectSquare, movePiece, validateMove } from './UpdateBoardState';
 
 import './Board.css'
 
@@ -27,7 +27,7 @@ export const Board = () => {
         if (state.currentlySelectedSquare == null && clickedSquare.piece == null)
             return;
 
-        let newState: BoardState;
+        let newState: BoardState | undefined;
         
         if (clickedSquare.selected) {
             newState = unselectSquare(state, file, rank);
@@ -36,7 +36,9 @@ export const Board = () => {
             newState = selectNewSquare(state, file, rank);
         }
         else {
-            newState = updateBoardState(state, file, rank);
+            if (validateMove(state, file, rank)) {
+                newState = movePiece(state, file, rank);
+            }
         }
 
         if (newState)
