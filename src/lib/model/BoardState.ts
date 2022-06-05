@@ -62,6 +62,10 @@ export function getSquare(boardState: BoardState, coordinates: Coordinates): Squ
     return boardState.squareGrid[fileToIndexMap[coordinates[0]]][rankToIndex(coordinates[1])];
 }
 
+export function getCoordinates(square: SquareState): Coordinates {
+    return [indexToFile(square.file), indexToRank(square.rank)];
+}
+
 export class BoardStateFactory {
     createBoardState(fileNum: number = 8, rankNum: number = 8): BoardState {
         let squareGrid = this.createSquareGrid(fileNum, rankNum);

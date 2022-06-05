@@ -36,6 +36,9 @@ export function isLegalPawnMove(boardState: BoardState, orig: Coordinates, dest:
         if (Math.abs(fileMovement) > 1 || rankMagnitude !== 1)
             return false;
 
+        // TODO: Not strictly correct, 
+        // does not handle special 'En passant' move. Comeback after state starts storing
+        // previous board states.
         if (!destinationHasEnemyTeam(originTeam, destination))
             return false;
     }
