@@ -2,43 +2,39 @@ import { BoardState, getCoordinates } from "../../lib/model/BoardState";
 import { SquareState } from "../../lib/model/SquareState";
 import { isLegalPawnMove } from "../../lib/pieces/Pawn";
 
-export const updateBoardState = (state: BoardState, file: number, rank: number): BoardState => {
-    const clickedSquare: SquareState = state.squareGrid[file][rank];
+
+
+export function unselectSquare(state: BoardState, file: number, rank: number): BoardState {
     const newState: BoardState = {...state};
-
-    // If square is already selected, simply unselect.
-    if (clickedSquare.selected) {
-        unselectSquare(newState, file, rank);
-    }
-
-    // If there is no currently selected square, select this one
-    // OR if selecting different square from previously selected square
-    else if (newState.currentlySelectedSquare == null || newState.currentlySelectedSquare.piece == null) {
-        selectNewSquare(newState, file, rank);
-    }
-    else {
-        movePiece(newState, file, rank);
-    }
-
-    return newState;
-};
-
-const unselectSquare = (state: BoardState, file: number, rank: number) => {
-    const square: SquareState = state.squareGrid[file][rank];
+    const square: SquareState = newState.squareGrid[file][rank];
     square.selected = false;
-    state.currentlySelectedSquare = undefined;
+    newState.currentlySelectedSquare = undefined;
+    return newState;
 }
 
-const selectNewSquare = (state: BoardState, file: number, rank: number) => {
-    let previouslySelectedSquare = state.currentlySelectedSquare;
+export function selectNewSquare(state: BoardState, file: number, rank: number): BoardState {
+    const newState: BoardState = {...state};
+    let previouslySelectedSquare = newState.currentlySelectedSquare;
     if (previouslySelectedSquare) {
         previouslySelectedSquare.selected = false;
     }
 
-    const square: SquareState = state.squareGrid[file][rank];
+    const square: SquareState = newState.squareGrid[file][rank];
     square.selected = true;
-    state.currentlySelectedSquare = square;
+    newState.currentlySelectedSquare = square;
+
+    return newState;
 }
+
+export const updateBoardState = (state: BoardState, file: number, rank: number): BoardState => {
+    const newState: BoardState = {...state};
+
+    // If there is no currently selected square, select this one
+    // OR if selecting different square from previously selected square
+    movePiece(newState, file, rank);
+
+    return newState;
+};
 
 const movePiece = (state: BoardState, file: number, rank: number) => {
     let prevSelectedSquare = state.currentlySelectedSquare;

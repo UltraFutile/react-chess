@@ -2,7 +2,7 @@ import React from 'react';
 import { BoardState, BoardStateFactory } from '../../lib/model/BoardState';
 import { SquareState } from '../../lib/model/SquareState';
 import { Square } from '../Square';
-import { updateBoardState } from './UpdateBoardState';
+import { selectNewSquare, unselectSquare, updateBoardState } from './UpdateBoardState';
 
 import './Board.css'
 
@@ -26,8 +26,21 @@ export const Board = () => {
         const clickedSquare: SquareState = state.squareGrid[file][rank];
         if (state.currentlySelectedSquare == null && clickedSquare.piece == null)
             return;
-        const newState: BoardState = updateBoardState(state, file, rank);
-        setBoardState(newState);
+
+        let newState: BoardState;
+        
+        if (clickedSquare.selected) {
+            newState = unselectSquare(state, file, rank);
+        }
+        else if (state.currentlySelectedSquare == null || state.currentlySelectedSquare.piece == null) {
+            newState = selectNewSquare(state, file, rank);
+        }
+        else {
+            newState = updateBoardState(state, file, rank);
+        }
+
+        if (newState)
+            setBoardState(newState);
     };
 
     const renderSquare = (squareState: SquareState) => {
