@@ -46,7 +46,8 @@ export class BoardStateFactory {
     
         return rows;
     }
-    private setBoardPieces(squareArray: SquareState[][]) {
+
+    setBoardPieces(squareArray: SquareState[][]) {
         // White pieces
         squareArray[0][0].piece = {
             team: Team.White,

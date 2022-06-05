@@ -17,8 +17,10 @@ import './Board.css'
  */
 export const Board = () => {
     const boardStateFactory = new BoardStateFactory();
+    const boardState: BoardState = boardStateFactory.createBoardState();
+    boardStateFactory.setBoardPieces(boardState.squareGrid);
 
-    const [state, setBoardState] = React.useState<BoardState>(boardStateFactory.createBoardState());
+    const [state, setBoardState] = React.useState<BoardState>(boardState);
 
     const onSquareClick = (file: number, rank: number) => {
         const clickedSquare: SquareState = state.squareGrid[file][rank];
