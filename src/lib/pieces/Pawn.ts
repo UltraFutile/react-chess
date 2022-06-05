@@ -1,5 +1,5 @@
 import { BoardRank, Coordinates } from "../../types/AlgebraicNotation";
-import { BoardState, getMovement, getSquare } from "../model/BoardState";
+import { BoardState, getDestination, getMovement, getSquare } from "../model/BoardState";
 import { SquareState } from "../model/SquareState";
 import { Team } from "../Team";
 
@@ -27,9 +27,8 @@ export function isLegalPawnMove(boardState: BoardState, orig: Coordinates, dest:
         return false;
 
     // Can't capture same team
-    if (destinationHasSameTeam(originTeam, destination)) {
+    if (destinationHasSameTeam(originTeam, destination))
         return false;
-    }
 
     if (origin.file !== destination.file) {
         // It must be by one
@@ -39,13 +38,14 @@ export function isLegalPawnMove(boardState: BoardState, orig: Coordinates, dest:
         // Must travel by one vertical space
         // There must be an enemy piece
     }
-
-    // Moving on same file
     else {
-        if (rankMagnitude === 2) {
-            if (orig[1] !== startingRank)
-                return false;
-        }
+        if (rankMagnitude === 2 && (orig[1] !== startingRank || destination.piece))
+            return false;
+            
+        // if there's any piece in front of pawn, move is illegal
+        const immediateSquare = getSquare(boardState, getDestination(boardState, orig, { rank: 1 * rankDirection }));
+        if (immediateSquare.piece)
+            return false;
     }
 
     if (destinationHasEnemyTeam(originTeam, destination)) {
@@ -61,11 +61,10 @@ const isMovingInWrongDirection = (team: Team, rankMovement: number) => {
     || (team === Team.Black && !(rankMovement < 0)));
 }
 
-
-function destinationHasSameTeam(origTeam: Team, dest: SquareState) {
+const destinationHasSameTeam = (origTeam: Team, dest: SquareState) => {
     return dest.piece && dest.piece.team === origTeam;
 }
 
-function destinationHasEnemyTeam(origTeam: Team, dest: SquareState) {
+const destinationHasEnemyTeam = (origTeam: Team, dest: SquareState) => {
     return dest.piece && dest.piece.team !== origTeam;
 }

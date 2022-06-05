@@ -17,7 +17,7 @@ describe.each([
         state = boardFactory.createBoardState();
     });
 
-    describe("pawn movement from starting position", () => {
+    describe("movement from starting position", () => {
         const origin: Coordinates = ['e', startingRank];
     
         beforeEach(() => {
@@ -33,7 +33,7 @@ describe.each([
         });
     });
 
-    describe('pawn movement after starting postiion', () => {
+    describe('movement after starting postiion', () => {
         const origin: Coordinates = ['e', startingRank + (1 * rankDirection) as BoardRank];
     
         beforeEach(() => {
@@ -49,7 +49,7 @@ describe.each([
         });
     });
     
-    describe('pawn illegal movement range', () => {
+    describe('illegal movement range', () => {
         const origin: Coordinates = ['e', startingRank + (1 * rankDirection) as BoardRank];
     
         beforeEach(() => {
@@ -70,7 +70,7 @@ describe.each([
         });
     });
 
-    describe('pawn illegal capture', () => {
+    describe('illegal captures', () => {
         const origin: Coordinates = ['e', startingRank + (1 * rankDirection) as BoardRank];
     
         beforeEach(() => {
@@ -85,4 +85,53 @@ describe.each([
         });
     });
     
+    describe('legal captures', () => {
+        const origin: Coordinates = ['e', startingRank + (1 * rankDirection) as BoardRank];
+    
+        beforeEach(() => {
+            addPiece(state, thisTeam, 'pawn', origin);
+            addPiece(state, otherTeam, 'pawn', getDestination(state, origin, { file: 1, rank: 1 * rankDirection }));
+            addPiece(state, otherTeam, 'pawn', getDestination(state, origin, { file: -1, rank: 1 * rankDirection }));
+        });
+    
+        it("can capture piece on enemy team", () => {
+            expect(isLegalPawnMove(state, origin, getDestination(state, origin, { file: 1, rank: 1 * rankDirection }))).toBe(true);
+            expect(isLegalPawnMove(state, origin, getDestination(state, origin, { file: -1, rank: 1 * rankDirection }))).toBe(true);
+        });
+    });
+
+    describe('movement with obstacles at starting position', () => {
+        const origin: Coordinates = ['e', startingRank];
+
+        describe("with only immediate obstacle", () => {
+            beforeEach(() => {
+                addPiece(state, thisTeam, 'pawn', origin);
+                addPiece(state, otherTeam, 'pawn', getDestination(state, origin, { rank: 1 * rankDirection }));
+            });
+        
+            it("can't move one square forward", () => {
+                expect(isLegalPawnMove(state, origin, getDestination(state, origin, { rank: 1 * rankDirection }))).toBe(false);
+            });
+        
+            it("can't move two squares forward", () => {
+                expect(isLegalPawnMove(state, origin, getDestination(state, origin, { rank: 2 * rankDirection }))).toBe(false);
+            });
+        });
+
+        describe("with obstacle two squares ahead", () => {
+            beforeEach(() => {
+                addPiece(state, thisTeam, 'pawn', origin);
+                addPiece(state, otherTeam, 'pawn', getDestination(state, origin, { rank: 2 * rankDirection }));
+            });
+        
+            it("can move one square forward", () => {
+                expect(isLegalPawnMove(state, origin, getDestination(state, origin, { rank: 1 * rankDirection }))).toBe(true);
+            });
+        
+            it("can't move two squares forward", () => {
+                expect(isLegalPawnMove(state, origin, getDestination(state, origin, { rank: 2 * rankDirection }))).toBe(false);
+            });
+        });
+        
+    })
 })
