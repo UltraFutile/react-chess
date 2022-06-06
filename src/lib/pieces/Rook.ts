@@ -29,7 +29,7 @@ export function isLegalRookMove(boardState: BoardState, orig: Coordinates, dest:
         return false;
     
     // check if there is any obstacle between origin and destination
-    let squareIterator = straightMovementGenerator(boardState, orig, dest);
+    const squareIterator = straightMovementGenerator(boardState, orig, dest);
     for (const square of squareIterator) {
         if (square.piece)
             return false;

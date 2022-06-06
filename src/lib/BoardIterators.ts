@@ -25,3 +25,26 @@ export function* straightMovementGenerator(boardState: BoardState, orig: Coordin
         rankIndex += rankIncrement;
     }
 }
+
+export function* diagonalMovementGenerator(boardState: BoardState, orig: Coordinates, dest: Coordinates, includeEndSquares: boolean = false) {
+    const [originFileIndex, originRankIndex] = getIndexesFromCoordinates(orig);
+    const [destFileIndex, destRankIndex] = getIndexesFromCoordinates(dest);
+    const [fileMovement, rankMovement] = getMovement(orig, dest);
+
+
+    const fileIncrement = fileMovement < 0 ? -1 : 1;
+    const rankIncrement = rankMovement < 0 ? -1 : 1;
+
+    let fileIndex = originFileIndex + (includeEndSquares ? 0 : fileIncrement);
+    let rankIndex = originRankIndex + (includeEndSquares ? 0 : rankIncrement);
+
+    let finalFileIndex = destFileIndex + (includeEndSquares ? fileIncrement : 0)
+    let finalRankIndex = destRankIndex + (includeEndSquares ? rankIncrement : 0)
+
+    while (fileIndex !== finalFileIndex || rankIndex !== finalRankIndex) {
+        yield getSquare(boardState, getCoordinatesFromIndexes(fileIndex, rankIndex));
+
+        fileIndex += fileIncrement;
+        rankIndex += rankIncrement;
+    }
+}
