@@ -1,5 +1,6 @@
 import { Coordinates } from "../../types/AlgebraicNotation";
-import { BoardState, getCoordinatesFromIndexes, getIndexesFromCoordinates, getMovement, getSquare } from "../model/BoardState";
+import { straightMovementGenerator } from "../BoardIterators";
+import { BoardState, getMovement, getSquare } from "../model/BoardState";
 import { SquareState } from "../model/SquareState";
 import { Team } from "../Team";
 import { destinationHasSameTeam } from "./PieceHelpers";
@@ -28,41 +29,10 @@ export function isLegalRookMove(boardState: BoardState, orig: Coordinates, dest:
         return false;
     
     // check if there is any obstacle between origin and destination
-    const [originFileIndex, originRankIndex] = getIndexesFromCoordinates(orig);
-    const [destFileIndex, destRankIndex] = getIndexesFromCoordinates(dest);
-
-    if (isMovingOnFile) {
-        if (fileMovement > 0 ) { // moving up
-            for (let i = originFileIndex + 1; i < destFileIndex; i++) {
-                const square: SquareState = getSquare(boardState, getCoordinatesFromIndexes(i, originRankIndex));
-                if (square.piece)
-                    return false;
-            }
-        }
-        else { // moving down
-            for (let i = originFileIndex - 1; i > destFileIndex; i--) {
-                const square: SquareState = getSquare(boardState, getCoordinatesFromIndexes(i, originRankIndex));
-                if (square.piece)
-                    return false;
-            }
-        }
-        
-    }
-    else if (isMovingOnRank) {
-        if (rankMovement > 0) { // moving right
-            for (let i = originRankIndex + 1; i < destRankIndex; i++) {
-                const square: SquareState = getSquare(boardState, getCoordinatesFromIndexes(originFileIndex, i));
-                if (square.piece)
-                    return false;
-            }
-        }
-        else {
-            for (let i = originRankIndex - 1; i > destRankIndex; i--) {
-                const square: SquareState = getSquare(boardState, getCoordinatesFromIndexes(originFileIndex, i));
-                if (square.piece)
-                    return false;
-            }
-        }
+    let squareIterator = straightMovementGenerator(boardState, orig, dest);
+    for (const square of squareIterator) {
+        if (square.piece)
+            return false;
     }
 
     return true;
