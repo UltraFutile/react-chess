@@ -22,6 +22,9 @@ const indexToFile = (index: number): BoardFile => indexToFileMap[index];
 const rankToIndex = (rank: BoardRank): number => rank - 1;
 const indexToRank = (index: number): BoardRank => (index + 1) as BoardRank;
 
+export function getCoordinatesFromIndexes(fileIndex: number, rankIndex: number): Coordinates {
+    return [indexToFile(fileIndex), indexToRank(rankIndex)];
+}
 
 export function getMovement(orig: Coordinates, dest: Coordinates) : [number, number] {
     return [
