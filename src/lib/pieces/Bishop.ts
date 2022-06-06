@@ -1,5 +1,5 @@
 import { Coordinates } from "../../types/AlgebraicNotation";
-import { BoardState, getMovement, getSquare } from "../model/BoardState";
+import { BoardState, getCoordinatesFromIndexes, getIndexesFromCoordinates, getMovement, getSquare } from "../model/BoardState";
 import { SquareState } from "../model/SquareState";
 import { Team } from "../Team";
 import { destinationHasSameTeam } from "./PieceHelpers";
@@ -24,5 +24,41 @@ export function isLegalBishopMove(boardState: BoardState, orig: Coordinates, des
     if (fileMagnitude !== rankMagnitude)
         return false;
     
+        const [origFileIndex, origRankIndex] = getIndexesFromCoordinates(orig);
+        const [destFileIndex, destRankIndex] = getIndexesFromCoordinates(dest);
+
+    if (fileMovement > 0 && rankMovement > 0) { // NE
+        for (let fileIndex = origFileIndex + 1, rankIndex = origRankIndex + 1; 
+            fileIndex < destFileIndex && rankIndex < destRankIndex; fileIndex++, rankIndex++) {
+            const square: SquareState = getSquare(boardState, getCoordinatesFromIndexes(fileIndex, rankIndex));
+            if (square.piece)
+                return false;
+        }
+    }
+    else if (fileMovement > 0 && rankMovement < 0) { // SE
+        for (let fileIndex = origFileIndex + 1, rankIndex = origRankIndex - 1; 
+            fileIndex < destFileIndex && rankIndex > destRankIndex; fileIndex++, rankIndex--) {
+            const square: SquareState = getSquare(boardState, getCoordinatesFromIndexes(fileIndex, rankIndex));
+            if (square.piece)
+                return false;
+        }
+    }
+    else if (fileMovement < 0 && rankMovement > 0) { // NW
+        for (let fileIndex = origFileIndex - 1, rankIndex = origRankIndex + 1; 
+            fileIndex > destFileIndex && rankIndex < destRankIndex; fileIndex--, rankIndex++) {
+            const square: SquareState = getSquare(boardState, getCoordinatesFromIndexes(fileIndex, rankIndex));
+            if (square.piece)
+                return false;
+        }
+    }
+    else { // SW
+        for (let fileIndex = origFileIndex - 1, rankIndex = origRankIndex - 1; 
+            fileIndex > destFileIndex && rankIndex > destRankIndex; fileIndex--, rankIndex--) {
+            const square: SquareState = getSquare(boardState, getCoordinatesFromIndexes(fileIndex, rankIndex));
+            if (square.piece)
+                return false;
+        }
+    }
+
     return true;       
 }
