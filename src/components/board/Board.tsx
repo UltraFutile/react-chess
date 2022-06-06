@@ -2,9 +2,9 @@ import React from 'react';
 import { BoardState, BoardStateFactory } from '../../lib/model/BoardState';
 import { SquareState } from '../../lib/model/SquareState';
 import { Square } from '../Square';
-import { selectNewSquare, unselectSquare, movePiece, validateMove } from './UpdateBoardState';
 
 import './Board.css'
+import { onSquareClickFactory } from './ValidateBoardAction';
 
 /**
  * Should maintain state of:
@@ -19,33 +19,8 @@ export const Board = () => {
     const boardStateFactory = new BoardStateFactory();
     const boardState: BoardState = boardStateFactory.createBoardState();
     boardStateFactory.setBoardPieces(boardState.squareGrid);
-
+    
     const [state, setBoardState] = React.useState<BoardState>(boardState);
-
-    const onSquareClick = (file: number, rank: number) => {
-        const clickedSquare: SquareState = state.squareGrid[file][rank];
-        if (state.currentlySelectedSquare == null && clickedSquare.piece == null)
-            return;
-
-        let newState: BoardState | undefined;
-        
-        if (clickedSquare.selected) {
-            newState = unselectSquare(state, file, rank);
-        }
-        else if (state.currentlySelectedSquare == null || state.currentlySelectedSquare.piece == null) {
-            if (state.whichTeamsTurn === clickedSquare.piece?.team) {
-                newState = selectNewSquare(state, file, rank);
-            }
-        }
-        else {
-            if (validateMove(state, file, rank)) {
-                newState = movePiece(state, file, rank);
-            }
-        }
-
-        if (newState)
-            setBoardState(newState);
-    };
 
     const renderSquare = (squareState: SquareState) => {
         return <Square 
@@ -55,7 +30,7 @@ export const Board = () => {
             color={squareState.color} 
             piece={squareState.piece}
             selected={squareState.selected}
-            onClick={onSquareClick} 
+            onClick={onSquareClickFactory(state, setBoardState)} 
         />;
     }
 
