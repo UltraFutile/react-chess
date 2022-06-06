@@ -2,6 +2,7 @@ import { BoardState, getCoordinates } from "../../lib/model/BoardState";
 import { SquareState } from "../../lib/model/SquareState";
 import { isLegalKnightMove } from "../../lib/pieces/Knight";
 import { isLegalPawnMove } from "../../lib/pieces/Pawn";
+import { isLegalRookMove } from "../../lib/pieces/Rook";
 import { Team } from "../../lib/Team";
 
 export function unselectSquare(state: BoardState, file: number, rank: number): BoardState {
@@ -41,6 +42,9 @@ export function validateMove(state: BoardState, file: number, rank: number): boo
             break;
         case 'knight':
             isValidMove = isLegalKnightMove(state, getCoordinates(prevSelectedSquare), getCoordinates(nextSquare));
+            break;
+        case 'rook':
+            isValidMove = isLegalRookMove(state, getCoordinates(prevSelectedSquare), getCoordinates(nextSquare));
             break;
     }
 
