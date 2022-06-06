@@ -1,6 +1,5 @@
-import { addPiece } from "../components/board/ManagePiece";
 import { Coordinates } from "../types/AlgebraicNotation";
-import { diagonalMovementGenerator } from "./BoardIterators";
+import { diagonalMovementGenerator, straightMovementGenerator } from "./BoardIterators";
 import { BoardStateFactory, BoardState, getDestination } from "./model/BoardState";
 
 describe("test board iterators", () => {
@@ -83,6 +82,72 @@ describe("test board iterators", () => {
             expect(squares.length).toBe(2);
             expect([squares[0].file, squares[0].rank]).toEqual([3, 4]);
             expect([squares[1].file, squares[1].rank]).toEqual([2, 5]);
+        });
+    });
+
+    describe("straight iterator tests", () => {
+        it("can iterate squares in north direction inclusively", () => {
+            let gen = straightMovementGenerator(state, origin, getDestination(state, origin, { rank: 2 }), true)
+            let squares = [...gen];
+            expect(squares.length).toBe(3);
+            expect([squares[0].file, squares[0].rank]).toEqual([4, 3]);
+            expect([squares[1].file, squares[1].rank]).toEqual([4, 4]);
+            expect([squares[2].file, squares[2].rank]).toEqual([4, 5]);
+        });
+
+        it("can iterate squares in north direction", () => {
+            let gen = straightMovementGenerator(state, origin, getDestination(state, origin, { rank: 2 }))
+            let squares = [...gen];
+            expect(squares.length).toBe(1);
+            expect([squares[0].file, squares[0].rank]).toEqual([4, 4]);
+        });
+
+        it("can iterate squares in south direction inclusively", () => {
+            let gen = straightMovementGenerator(state, origin, getDestination(state, origin, { rank: -2 }), true)
+            let squares = [...gen];
+            expect(squares.length).toBe(3);
+            expect([squares[0].file, squares[0].rank]).toEqual([4, 3]);
+            expect([squares[1].file, squares[1].rank]).toEqual([4, 2]);
+            expect([squares[2].file, squares[2].rank]).toEqual([4, 1]);
+        });
+
+        it("can iterate squares in south direction", () => {
+            let gen = straightMovementGenerator(state, origin, getDestination(state, origin, { rank: -2 }))
+            let squares = [...gen];
+            expect(squares.length).toBe(1);
+            expect([squares[0].file, squares[0].rank]).toEqual([4, 2]);
+        });
+
+        it("can iterate squares in west direction inclusively", () => {
+            let gen = straightMovementGenerator(state, origin, getDestination(state, origin, { file: -2 }), true)
+            let squares = [...gen];
+            expect(squares.length).toBe(3);
+            expect([squares[0].file, squares[0].rank]).toEqual([4, 3]);
+            expect([squares[1].file, squares[1].rank]).toEqual([3, 3]);
+            expect([squares[2].file, squares[2].rank]).toEqual([2, 3]);
+        });
+
+        it("can iterate squares in west direction", () => {
+            let gen = straightMovementGenerator(state, origin, getDestination(state, origin, { file: -2 }))
+            let squares = [...gen];
+            expect(squares.length).toBe(1);
+            expect([squares[0].file, squares[0].rank]).toEqual([3, 3]);
+        });
+
+        it("can iterate squares in east direction inclusively", () => {
+            let gen = straightMovementGenerator(state, origin, getDestination(state, origin, { file: 2 }), true)
+            let squares = [...gen];
+            expect(squares.length).toBe(3);
+            expect([squares[0].file, squares[0].rank]).toEqual([4, 3]);
+            expect([squares[1].file, squares[1].rank]).toEqual([5, 3]);
+            expect([squares[2].file, squares[2].rank]).toEqual([6, 3]);
+        });
+
+        it("can iterate squares in east direction", () => {
+            let gen = straightMovementGenerator(state, origin, getDestination(state, origin, { file: 2 }))
+            let squares = [...gen];
+            expect(squares.length).toBe(1);
+            expect([squares[0].file, squares[0].rank]).toEqual([5, 3]);
         });
     });
 
