@@ -22,10 +22,6 @@ const indexToFile = (index: number): BoardFile => indexToFileMap[index];
 const rankToIndex = (rank: BoardRank): number => rank - 1;
 const indexToRank = (index: number): BoardRank => (index + 1) as BoardRank;
 
-export function getCoordinatesFromIndexes(fileIndex: number, rankIndex: number): Coordinates {
-    return [indexToFile(fileIndex), indexToRank(rankIndex)];
-}
-
 export function getMovement(orig: Coordinates, dest: Coordinates) : [number, number] {
     return [
         fileToIndex(dest[0]) - fileToIndex(orig[0]), 
@@ -68,6 +64,14 @@ export function getSquare(boardState: BoardState, coordinates: Coordinates): Squ
 
 export function getCoordinates(square: SquareState): Coordinates {
     return [indexToFile(square.file), indexToRank(square.rank)];
+}
+
+export function getCoordinatesFromIndexes(fileIndex: number, rankIndex: number): Coordinates {
+    return [indexToFile(fileIndex), indexToRank(rankIndex)];
+}
+
+export function getIndexesFromCoordinates(coordinates: Coordinates): [number, number] {
+    return [fileToIndex(coordinates[0]), rankToIndex(coordinates[1])];
 }
 
 export class BoardStateFactory {

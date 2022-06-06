@@ -37,4 +37,23 @@ describe.each([
             }
         });
     });
+
+    describe("movement with obstacles", () => {
+        const origin: Coordinates = ['e', 4];
+
+        beforeEach(() => {
+            addPiece(state, thisTeam, 'rook', origin);
+            addPiece(state, otherTeam, 'pawn', getDestination(state, origin, { rank: 1 }));
+            addPiece(state, otherTeam, 'pawn', getDestination(state, origin, { rank: -1 }));
+            addPiece(state, otherTeam, 'pawn', getDestination(state, origin, { file: 1 }));
+            addPiece(state, otherTeam, 'pawn', getDestination(state, origin, { file: -1 }));
+        });
+
+        it("can't move when there are obstacles in it's path", () => {
+            expect(isLegalRookMove(state, origin, getDestination(state, origin, { rank: 2 }))).toBe(false);
+            expect(isLegalRookMove(state, origin, getDestination(state, origin, { rank: -2 }))).toBe(false);
+            expect(isLegalRookMove(state, origin, getDestination(state, origin, { file: 2 }))).toBe(false);
+            expect(isLegalRookMove(state, origin, getDestination(state, origin, { file: -2 }))).toBe(false);
+        });
+    });
 });
