@@ -8,7 +8,7 @@ type Props = {
     color: string
     piece?: PieceProps
     selected: boolean
-    onClick: (file: number, rank: number) => void
+    onClick: () => void
 }
 
 const fileCharStr = "ABCDEFGH";
@@ -22,7 +22,7 @@ export const Square = (props: Props) => {
         <button 
             className="square" 
             style={buttonStyle} 
-            onClick={() => props.onClick(props.file, props.rank)} 
+            onClick={props.onClick} 
             title={`${fileCharStr[props.file]}${props.rank + 1} (${props.file}, ${props.rank})`}>
             {getPieceComponent(props.piece)}
         </button>
@@ -46,7 +46,6 @@ function getPieceComponent(piece?: PieceProps) {
                 return <Pawn team={piece.team}></Pawn>;
             default:
                 throw new Error("piece does not exist");
-        }
-        
+        }   
     }
 }

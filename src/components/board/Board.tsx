@@ -30,7 +30,7 @@ export const Board = () => {
             color={squareState.color} 
             piece={squareState.piece}
             selected={squareState.selected}
-            onClick={onSquareClickFactory(state, setBoardState)} 
+            onClick={onSquareClickFactory(state, setBoardState)(squareState.file, squareState.rank)} 
         />;
     }
 

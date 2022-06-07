@@ -1,42 +1,35 @@
+import React from 'react';
 import { BoardState, getCoordinates } from "../../lib/model/BoardState";
 import { SquareState } from "../../lib/model/SquareState";
 import { unselectSquare, selectNewSquare, movePiece } from "./UpdateBoardState";
-import React from 'react';
 import { isLegalBishopMove } from "../../lib/pieces/Bishop";
 import { isLegalKnightMove } from "../../lib/pieces/Knight";
 import { isLegalPawnMove } from "../../lib/pieces/Pawn";
 import { isLegalRookMove } from "../../lib/pieces/Rook";
 
+export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch<React.SetStateAction<BoardState>>) => 
+    (fileIndex: number, rankIndex: number) => () => {
+    const clickedSquare: SquareState = state.squareGrid[fileIndex][rankIndex];
+    if (state.currentlySelectedSquare == null && clickedSquare.piece == null)
+        return;
+
+    if (clickedSquare.selected) {
+        setState(unselectSquare(state, fileIndex, rankIndex));
+    }
+    else if (state.currentlySelectedSquare == null || state.currentlySelectedSquare.piece == null) {
+        if (state.whichTeamsTurn === clickedSquare.piece?.team) {
+            setState(selectNewSquare(state, fileIndex, rankIndex));
+        }
+    }
+    else {
+        if (validateMove(state, fileIndex, rankIndex)) {
+            setState(movePiece(state, fileIndex, rankIndex));
+        }
+    }
+};
 
 
-export function onSquareClickFactory(state: BoardState, setState: React.Dispatch<React.SetStateAction<BoardState>> ) {
-    return (file: number, rank: number) => {
-        const clickedSquare: SquareState = state.squareGrid[file][rank];
-        if (state.currentlySelectedSquare == null && clickedSquare.piece == null)
-            return;
-    
-        let newState: BoardState | undefined;
-        
-        if (clickedSquare.selected) {
-            newState = unselectSquare(state, file, rank);
-        }
-        else if (state.currentlySelectedSquare == null || state.currentlySelectedSquare.piece == null) {
-            if (state.whichTeamsTurn === clickedSquare.piece?.team) {
-                newState = selectNewSquare(state, file, rank);
-            }
-        }
-        else {
-            if (validateMove(state, file, rank)) {
-                newState = movePiece(state, file, rank);
-            }
-        }
-    
-        if (newState)
-            setState(newState);
-    };
-}
-
-function validateMove(state: BoardState, file: number, rank: number): boolean {
+const validateMove = (state: BoardState, file: number, rank: number): boolean => {
     let prevSelectedSquare = state.currentlySelectedSquare;
     if (prevSelectedSquare == null || prevSelectedSquare.piece == null) {
         throw new Error("Attempted to move piece without selecting one");
