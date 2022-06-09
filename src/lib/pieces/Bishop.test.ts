@@ -1,6 +1,5 @@
 import { addPiece } from "../../components/board/ManagePiece";
 import { Coordinates } from "../../types/AlgebraicNotation";
-import { diagonalMovementGenerator } from "../BoardIterators";
 import { BoardStateFactory, BoardState, getCoordinatesFromIndexes, getIndexesFromCoordinates, getDestination } from "../model/BoardState";
 import { Team } from "../Team";
 import { isLegalBishopMove } from "./Bishop";

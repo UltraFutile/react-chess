@@ -59,6 +59,10 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
         case 'king':
             isValidMove = isLegalKingMove(getCoordinates(prevSquare), getCoordinates(nextSquare));
             break;
+        case 'queen':
+            isValidMove = isLegalBishopMove(state, getCoordinates(prevSquare), getCoordinates(nextSquare))
+                        || isLegalRookMove(state, getCoordinates(prevSquare), getCoordinates(nextSquare));
+            break;
     }
 
     return isValidMove;
