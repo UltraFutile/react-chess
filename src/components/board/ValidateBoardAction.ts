@@ -8,6 +8,7 @@ import { isLegalPawnMove } from "../../lib/pieces/Pawn";
 import { isLegalRookMove } from "../../lib/pieces/Rook";
 import { isLegalKingMove } from '../../lib/pieces/King';
 import { Team } from '../../lib/Team';
+import { destinationHasSameTeam } from '../../lib/pieces/PieceHelpers';
 
 export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch<React.SetStateAction<BoardState>>) => 
     (fileIndex: number, rankIndex: number) => () => {
@@ -37,6 +38,9 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
         throw new Error("Attempted to move piece without selecting one");
     }
 
+    if (destinationHasSameTeam(prevSquare.piece.team, nextSquare))
+        return false;
+
     // validate move attempt
     let isValidMove: boolean = true;
     switch(prevSquare.piece.piece) {
@@ -53,7 +57,7 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
             isValidMove = isLegalBishopMove(state, getCoordinates(prevSquare), getCoordinates(nextSquare));
             break;
         case 'king':
-            isValidMove = isLegalKingMove(state, getCoordinates(prevSquare), getCoordinates(nextSquare));
+            isValidMove = isLegalKingMove(getCoordinates(prevSquare), getCoordinates(nextSquare));
             break;
     }
 

@@ -29,28 +29,7 @@ describe.each([
         it.each([
             kingLegalDestinations.map((value) => { return {coordinates: value}; })
         ])("can move one square to (%j)", ({ coordinates }) => {
-            expect(isLegalKingMove(state, origin, coordinates)).toBe(true);
-        });
-    });
-
-    describe("illegal captures", () => {
-        const origin: Coordinates = ['e', 4];
-        const kingLegalDestinations: Coordinates[] = [
-            ['e', 5], ['f', 5], ['f', 4], ['f', 3], 
-            ['e', 3], ['d', 3], ['d', 4], ['d', 5]
-        ];
-
-        beforeEach(() => {
-            addPiece(state, thisTeam, 'king', origin);
-            kingLegalDestinations.forEach((value: Coordinates) => {
-                addPiece(state, thisTeam, 'pawn',  value);
-            });
-        });
-        
-        it.each([
-            kingLegalDestinations.map((value) => { return {coordinates: value}; })
-        ])("can not capture piece of same team at (%j)", ({ coordinates }) => {
-            expect(isLegalKingMove(state, origin, coordinates)).toBe(false);
+            expect(isLegalKingMove(origin, coordinates)).toBe(true);
         });
     });
 
@@ -71,7 +50,7 @@ describe.each([
         it.each([
             kingLegalDestinations.map((value) => { return {coordinates: value}; })
         ])("can capture enemey pieces at (%j)", ({ coordinates }) => {
-            expect(isLegalKingMove(state, origin, coordinates)).toBe(true);
+            expect(isLegalKingMove(origin, coordinates)).toBe(true);
         });
     });
 
@@ -90,7 +69,7 @@ describe.each([
         it.each([
             immediateSurroundingSquares.map((value) => { return {coordinates: value}; })
         ])("can't move beyond range to square at (%j)", ({ coordinates }) => {
-            expect(isLegalKingMove(state, origin, coordinates)).toBe(false);
+            expect(isLegalKingMove(origin, coordinates)).toBe(false);
         });
     });
 })
