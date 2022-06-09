@@ -1,6 +1,6 @@
 import { Coordinates } from "../../types/AlgebraicNotation";
-import { straightMovementGenerator } from "../BoardIterators";
 import { BoardState, getMovement } from "../model/BoardState";
+import { isClearStraightPath } from "./PieceHelpers";
 
 export function isLegalRookMove(boardState: BoardState, orig: Coordinates, dest: Coordinates): boolean {
     const [fileMovement, rankMovement] = getMovement(orig, dest);
@@ -12,13 +12,6 @@ export function isLegalRookMove(boardState: BoardState, orig: Coordinates, dest:
 
     if (!isMovingOnFile && !isMovingOnRank)
         return false;
-    
-    // check if there is any obstacle between origin and destination
-    const squareIterator = straightMovementGenerator(boardState, orig, dest);
-    for (const square of squareIterator) {
-        if (square.piece)
-            return false;
-    }
 
-    return true;
+    return isClearStraightPath(boardState, orig, dest);
 }
