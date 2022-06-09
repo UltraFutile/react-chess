@@ -1,7 +1,7 @@
 import React from 'react';
 import { BoardState, getCoordinates } from "../../lib/model/BoardState";
 import { SquareState } from "../../lib/model/SquareState";
-import { unselectSquare, selectNewSquare, movePiece } from "./UpdateBoardState";
+import { toggleSquareSelect, movePiece } from "./UpdateBoardState";
 import { isLegalBishopMove } from "../../lib/pieces/Bishop";
 import { isLegalKnightMove } from "../../lib/pieces/Knight";
 import { isLegalPawnMove } from "../../lib/pieces/Pawn";
@@ -20,11 +20,8 @@ export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch
         return;
     }
     
-    if (sameSquareSelected) {
-        setState(unselectSquare(state, fileIndex, rankIndex));
-    }
-    else if (isNewPieceSelected(nextSquare, state.whichTeamsTurn)) {
-        setState(selectNewSquare(state, fileIndex, rankIndex));
+    if (sameSquareSelected || isNewPieceSelected(nextSquare, state.whichTeamsTurn)) {
+        setState(toggleSquareSelect(state, fileIndex, rankIndex));
     }
     else if (validateMove(state, prevSquare, nextSquare)) {
         setState(movePiece(state, fileIndex, rankIndex));

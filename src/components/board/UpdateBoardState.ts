@@ -2,24 +2,21 @@ import { BoardState } from "../../lib/model/BoardState";
 import { SquareState } from "../../lib/model/SquareState";
 import { Team } from "../../lib/Team";
 
-export function unselectSquare(state: BoardState, file: number, rank: number): BoardState {
+export function toggleSquareSelect(state: BoardState, file: number, rank: number): BoardState {
     const newState: BoardState = {...state};
-    const square: SquareState = newState.squareGrid[file][rank];
-    square.selected = false;
-    newState.currentlySelectedSquare = undefined;
-    return newState;
-}
+    const nextSquare: SquareState = newState.squareGrid[file][rank];
 
-export function selectNewSquare(state: BoardState, file: number, rank: number): BoardState {
-    const newState: BoardState = {...state};
-    let previouslySelectedSquare = newState.currentlySelectedSquare;
-    if (previouslySelectedSquare) {
-        previouslySelectedSquare.selected = false;
+    if (nextSquare.selected) {
+        nextSquare.selected = false;
+        newState.currentlySelectedSquare = undefined;    
     }
-
-    const square: SquareState = newState.squareGrid[file][rank];
-    square.selected = true;
-    newState.currentlySelectedSquare = square;
+    else {
+        nextSquare.selected = true;
+        if (newState.currentlySelectedSquare) {
+            newState.currentlySelectedSquare.selected = false;
+        }
+        newState.currentlySelectedSquare = nextSquare;
+    }
 
     return newState;
 }
