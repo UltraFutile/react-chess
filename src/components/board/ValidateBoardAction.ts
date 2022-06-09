@@ -48,7 +48,7 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
             isValidMove = isLegalPawnMove(state, getCoordinates(prevSquare), getCoordinates(nextSquare));
             break;
         case 'knight':
-            isValidMove = isLegalKnightMove(state, getCoordinates(prevSquare), getCoordinates(nextSquare));
+            isValidMove = isLegalKnightMove(getCoordinates(prevSquare), getCoordinates(nextSquare));
             break;
         case 'rook':
             isValidMove = isLegalRookMove(state, getCoordinates(prevSquare), getCoordinates(nextSquare));

@@ -29,28 +29,7 @@ describe.each([
         it.each([
             knightLegalDestinations.map((value) => { return {coordinates: value}; })
         ])("can move two squares and one diagonal to (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(state, origin, coordinates)).toBe(true);
-        });
-    });
-
-    describe("illegal captures", () => {
-        const origin: Coordinates = ['e', 4];
-        const knightLegalDestinations: Coordinates[] = [
-            ['f', 6], ['g', 5], ['g', 3], ['f', 2], 
-            ['d', 2], ['c', 3], ['c', 5], ['d', 6]
-        ];
-
-        beforeEach(() => {
-            addPiece(state, thisTeam, 'knight', origin);
-            knightLegalDestinations.forEach((value: Coordinates) => {
-                addPiece(state, thisTeam, 'pawn',  value);
-            });
-        });
-        
-        it.each([
-            knightLegalDestinations.map((value) => { return {coordinates: value}; })
-        ])("can not capture piece of same team at (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(state, origin, coordinates)).toBe(false);
+            expect(isLegalKnightMove(origin, coordinates)).toBe(true);
         });
     });
 
@@ -71,7 +50,7 @@ describe.each([
         it.each([
             knightLegalDestinations.map((value) => { return {coordinates: value}; })
         ])("can capture enemey pieces at (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(state, origin, coordinates)).toBe(true);
+            expect(isLegalKnightMove(origin, coordinates)).toBe(true);
         });
     });
 
@@ -89,7 +68,7 @@ describe.each([
         it.each([
             immediateSurroundingSquares.map((value) => { return {coordinates: value}; })
         ])("can't move to immediate square at (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(state, origin, coordinates)).toBe(false);
+            expect(isLegalKnightMove(origin, coordinates)).toBe(false);
         });
     });
 
@@ -106,7 +85,7 @@ describe.each([
         it.each([
             immediateSurroundingSquares.map((value) => { return {coordinates: value}; })
         ])("can't move only two squares to (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(state, origin, coordinates)).toBe(false);
+            expect(isLegalKnightMove(origin, coordinates)).toBe(false);
         });
     });
 
@@ -124,7 +103,7 @@ describe.each([
         it.each([
             immediateSurroundingSquares.map((value) => { return {coordinates: value}; })
         ])("can't move out of range to (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(state, origin, coordinates)).toBe(false);
+            expect(isLegalKnightMove(origin, coordinates)).toBe(false);
         });
     });
 })
