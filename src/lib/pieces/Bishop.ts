@@ -3,7 +3,6 @@ import { diagonalMovementGenerator } from "../BoardIterators";
 import { BoardState, getMovement } from "../model/BoardState";
 
 export function isLegalBishopMove(boardState: BoardState, orig: Coordinates, dest: Coordinates) {
-
     const [fileMovement, rankMovement] = getMovement(orig, dest);
     const fileMagnitude: number = Math.abs(fileMovement);
     const rankMagnitude: number = Math.abs(rankMovement);
