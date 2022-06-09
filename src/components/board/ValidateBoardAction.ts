@@ -14,29 +14,28 @@ export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch
     const prevSquare = state.currentlySelectedSquare;
     const nextSquare: SquareState = state.squareGrid[fileIndex][rankIndex];
     const sameSquareSelected = nextSquare.selected;
-    const noPieceSelected = prevSquare == null && nextSquare.piece == null;
 
-    if (noPieceSelected)
+    if (prevSquare == null 
+        && (nextSquare.piece == null || nextSquare.piece.team !== state.whichTeamsTurn)) {
         return;
-
+    }
+    
     if (sameSquareSelected) {
         setState(unselectSquare(state, fileIndex, rankIndex));
     }
-    else if (isNewPieceSelected(prevSquare, nextSquare, state.whichTeamsTurn)) {
+    else if (isNewPieceSelected(nextSquare, state.whichTeamsTurn)) {
         setState(selectNewSquare(state, fileIndex, rankIndex));
     }
-    else if (validateMove(prevSquare, nextSquare, state)) {
+    else if (validateMove(state, prevSquare, nextSquare)) {
         setState(movePiece(state, fileIndex, rankIndex));
     }
 };
 
-const isNewPieceSelected = (prevSquare: SquareState | undefined, nextSquare: SquareState, currentTeam: Team) => {
-    const noPieceSelectedYet = prevSquare == null || prevSquare.piece == null;
-    const currentTeamPieceSelected = nextSquare.piece?.team === currentTeam;
-    return noPieceSelectedYet && currentTeamPieceSelected;
+const isNewPieceSelected = (nextSquare: SquareState, currentTeam: Team) => {
+    return nextSquare.piece?.team === currentTeam;
 }
 
-const validateMove = (prevSquare: SquareState | undefined, nextSquare: SquareState, state: BoardState): boolean => {
+const validateMove = (state: BoardState, prevSquare: SquareState | undefined, nextSquare: SquareState): boolean => {
     if (prevSquare == null || prevSquare.piece == null) {
         throw new Error("Attempted to move piece without selecting one");
     }
