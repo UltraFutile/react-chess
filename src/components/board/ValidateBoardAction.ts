@@ -6,28 +6,34 @@ import { isLegalBishopMove } from "../../lib/pieces/Bishop";
 import { isLegalKnightMove } from "../../lib/pieces/Knight";
 import { isLegalPawnMove } from "../../lib/pieces/Pawn";
 import { isLegalRookMove } from "../../lib/pieces/Rook";
+import { isLegalKingMove } from '../../lib/pieces/King';
+import { Team } from '../../lib/Team';
 
 export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch<React.SetStateAction<BoardState>>) => 
     (fileIndex: number, rankIndex: number) => () => {
     const clickedSquare: SquareState = state.squareGrid[fileIndex][rankIndex];
-    if (state.currentlySelectedSquare == null && clickedSquare.piece == null)
-        return;
+    const sameSquareSelected = clickedSquare.selected;
+    const noPieceSelected = state.currentlySelectedSquare == null && clickedSquare.piece == null;
 
-    if (clickedSquare.selected) {
+    if (noPieceSelected)
+        return;
+    
+    if (sameSquareSelected) {
         setState(unselectSquare(state, fileIndex, rankIndex));
     }
-    else if (state.currentlySelectedSquare == null || state.currentlySelectedSquare.piece == null) {
-        if (state.whichTeamsTurn === clickedSquare.piece?.team) {
-            setState(selectNewSquare(state, fileIndex, rankIndex));
-        }
+    else if (isNewPieceSelected(state.currentlySelectedSquare, clickedSquare, state.whichTeamsTurn)) {
+        setState(selectNewSquare(state, fileIndex, rankIndex));
     }
-    else {
-        if (validateMove(state, fileIndex, rankIndex)) {
-            setState(movePiece(state, fileIndex, rankIndex));
-        }
+    else if (validateMove(state, fileIndex, rankIndex)) {
+        setState(movePiece(state, fileIndex, rankIndex));
     }
 };
 
+const isNewPieceSelected = (prevSquare: SquareState | undefined, nextSquare: SquareState, currentTeam: Team) => {
+    const noPieceSelectedYet = prevSquare == null || prevSquare.piece == null;
+    const currentTeamPieceSelected = nextSquare.piece?.team === currentTeam;
+    return noPieceSelectedYet && currentTeamPieceSelected;
+}
 
 const validateMove = (state: BoardState, file: number, rank: number): boolean => {
     let prevSelectedSquare = state.currentlySelectedSquare;
@@ -36,6 +42,7 @@ const validateMove = (state: BoardState, file: number, rank: number): boolean =>
     }
 
     const nextSquare: SquareState = state.squareGrid[file][rank];
+
     // validate move attempt
     let isValidMove: boolean = true;
     switch(prevSelectedSquare.piece.piece) {
@@ -50,6 +57,9 @@ const validateMove = (state: BoardState, file: number, rank: number): boolean =>
             break;
         case 'bishop':
             isValidMove = isLegalBishopMove(state, getCoordinates(prevSelectedSquare), getCoordinates(nextSquare));
+            break;
+        case 'king':
+            isValidMove = isLegalKingMove(state, getCoordinates(prevSelectedSquare), getCoordinates(nextSquare));
             break;
     }
 
