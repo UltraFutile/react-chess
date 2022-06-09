@@ -20,7 +20,7 @@ export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch
         return;
     }
     
-    if (sameSquareSelected || isNewPieceSelected(nextSquare, state.whichTeamsTurn)) {
+    if (sameSquareSelected || teamPieceSelected(nextSquare, state.whichTeamsTurn)) {
         setState(toggleSquareSelect(state, fileIndex, rankIndex));
     }
     else if (validateMove(state, prevSquare, nextSquare)) {
@@ -28,7 +28,7 @@ export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch
     }
 };
 
-const isNewPieceSelected = (nextSquare: SquareState, currentTeam: Team) => {
+const teamPieceSelected = (nextSquare: SquareState, currentTeam: Team) => {
     return nextSquare.piece?.team === currentTeam;
 }
 
