@@ -29,7 +29,7 @@ describe.each([
         it.each([
             kingLegalDestinations.map((value) => { return {coordinates: value}; })
         ])("can move one square to (%j)", ({ coordinates }) => {
-            expect(isLegalKingMove(origin, coordinates)).toBe(true);
+            expect(isLegalKingMove(state, origin, coordinates)).toBe(true);
         });
     });
 
@@ -50,7 +50,7 @@ describe.each([
         it.each([
             kingLegalDestinations.map((value) => { return {coordinates: value}; })
         ])("can capture enemey pieces at (%j)", ({ coordinates }) => {
-            expect(isLegalKingMove(origin, coordinates)).toBe(true);
+            expect(isLegalKingMove(state, origin, coordinates)).toBe(true);
         });
     });
 
@@ -69,7 +69,7 @@ describe.each([
         it.each([
             immediateSurroundingSquares.map((value) => { return {coordinates: value}; })
         ])("can't move beyond range to square at (%j)", ({ coordinates }) => {
-            expect(isLegalKingMove(origin, coordinates)).toBe(false);
+            expect(isLegalKingMove(state, origin, coordinates)).toBe(false);
         });
     });
 })

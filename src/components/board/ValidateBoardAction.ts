@@ -9,7 +9,8 @@ import { isLegalRookMove } from "../../lib/pieces/Rook";
 import { isLegalKingMove } from '../../lib/pieces/King';
 import { Team } from '../../lib/Team';
 import { destinationHasSameTeam } from '../../lib/pieces/PieceHelpers';
-import { PieceProps } from '../../lib/model/PieceProps';
+import { Piece, PieceProps } from '../../lib/model/PieceProps';
+import { Coordinates } from '../../types/AlgebraicNotation';
 
 export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch<React.SetStateAction<BoardState>>) => 
     (fileIndex: number, rankIndex: number) => () => {
@@ -27,6 +28,19 @@ export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch
     }
     else if (validateMove(state, prevSquare, nextSquare)) {
         setState(movePiece(state, fileIndex, rankIndex));
+        // Check for checkmate OR stalemate
+
+
+        // Get all team pieces attacking enemy king. (nextsquare piece, and then check  r/b/q)
+
+        // no pieces attacking king? => check for stalemate
+        // else, 
+
+        // Are all the squares enemy king can move to being attacked?
+        // Is there more than one piece attacking the king? -> true
+        // - Can the piece attacking the king be captured?
+        // - Can the piece attacking the king be blocked?
+
     }
 };
 
@@ -43,28 +57,7 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
         return false;
 
     // validate move attempt
-    let isValidMove: boolean = true;
-    switch(prevSquare.piece.piece) {
-        case 'pawn':
-            isValidMove = isLegalPawnMove(state, getCoordinates(prevSquare), getCoordinates(nextSquare));
-            break;
-        case 'knight':
-            isValidMove = isLegalKnightMove(getCoordinates(prevSquare), getCoordinates(nextSquare));
-            break;
-        case 'rook':
-            isValidMove = isLegalRookMove(state, getCoordinates(prevSquare), getCoordinates(nextSquare));
-            break;
-        case 'bishop':
-            isValidMove = isLegalBishopMove(state, getCoordinates(prevSquare), getCoordinates(nextSquare));
-            break;
-        case 'king':
-            isValidMove = isLegalKingMove(getCoordinates(prevSquare), getCoordinates(nextSquare));
-            break;
-        case 'queen':
-            isValidMove = isLegalBishopMove(state, getCoordinates(prevSquare), getCoordinates(nextSquare))
-                        || isLegalRookMove(state, getCoordinates(prevSquare), getCoordinates(nextSquare));
-            break;
-    }
+    let isValidMove: boolean = getValidationForPiece(prevSquare.piece.piece)(state, getCoordinates(prevSquare), getCoordinates(nextSquare));
 
     if (!isValidMove) {
         return false;
@@ -76,49 +69,13 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
     if (prevSquare.piece.piece === 'king') {
         // check if any enemy piece can attack king's new position. (maybe move this to under isLegalKingMove?)
         const doesMoveResultInCheck = simulateMove(state, prevSquare, nextSquare, () => {
-            // TODO: need access to pieces!
-            // map = {piece: squareState[]}
-            // map.keys.foreach OR map[piece].foreach
-            for (let square of enemyPieceMap['pawn']) {
-                if (isLegalPawnMove(state, getCoordinates(square), getCoordinates(nextSquare))) {
-                    console.log("Under attack by pawn")
-                    return true;
-                }
-            }
-
-            for (let square of enemyPieceMap['knight']) {
-                if (isLegalKnightMove(getCoordinates(square), getCoordinates(nextSquare))) {
-                    console.log("Under attack by knight")
-                    return true;
-                }
-            }
-
-            for (let square of enemyPieceMap['rook']) {
-                if (isLegalRookMove(state, getCoordinates(square), getCoordinates(nextSquare))) {
-                    console.log("Under attack by rook")
-                    return true;
-                }
-            }
-
-            for (let square of enemyPieceMap['bishop']) {
-                if (isLegalBishopMove(state, getCoordinates(square), getCoordinates(nextSquare))) {
-                    console.log("Under attack by bishop")
-                    return true;
-                }
-            }
-
-            for (let square of enemyPieceMap['king']) {
-                if (isLegalKingMove(getCoordinates(square), getCoordinates(nextSquare))) {
-                    console.log("Under attack by king")
-                    return true;
-                }
-            }
-
-            for (let square of enemyPieceMap['queen']) {
-                if (isLegalBishopMove(state, getCoordinates(square), getCoordinates(nextSquare))
-                || isLegalRookMove(state, getCoordinates(square), getCoordinates(nextSquare))) {
-                    console.log("Under attack by queen")
-                    return true;
+            let piece: keyof typeof enemyPieceMap;
+            for (piece in enemyPieceMap) {
+                for (let square of enemyPieceMap[piece as keyof typeof enemyPieceMap]) {
+                    if (getValidationForPiece(piece)(state, getCoordinates(square), getCoordinates(nextSquare))) {
+                        console.log("Under attack by " + piece);
+                        return true;
+                    }
                 }
             }
             return false;
@@ -132,28 +89,15 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
         const kingSquare: SquareState = teamPieceMap['king'].values().next().value;
         console.log(kingSquare);
         const doesMoveResultInCheck = simulateMove(state, prevSquare, nextSquare, () => {
-            for (let square of enemyPieceMap['rook']) {
-                if (isLegalRookMove(state, getCoordinates(square), getCoordinates(kingSquare))) {
-                    console.log("Under attack by rook")
-                    return true;
+            let piecesThatCanDiscoverCheck: Piece[] = ['rook', 'bishop', 'queen'];
+            for (let piece of piecesThatCanDiscoverCheck) {
+                for (let square of enemyPieceMap[piece]) {
+                    if (getValidationForPiece(piece)(state, getCoordinates(square), getCoordinates(kingSquare))) {
+                        console.log("Under attack by " + piece);
+                        return true;
+                    }
                 }
             }
-            
-            for (let square of enemyPieceMap['bishop']) {
-                if (isLegalBishopMove(state, getCoordinates(square), getCoordinates(kingSquare))) {
-                    console.log("Under attack by bishop")
-                    return true;
-                }
-            }
-
-            for (let square of enemyPieceMap['queen']) {
-                if (isLegalBishopMove(state, getCoordinates(square), getCoordinates(kingSquare))
-                || isLegalRookMove(state, getCoordinates(square), getCoordinates(kingSquare))) {
-                    console.log("Under attack by queen")
-                    return true;
-                }
-            }
-
             return false;
         });
 
@@ -206,3 +150,27 @@ const simulateMove = (state: BoardState, prevSquare: SquareState, nextSquare: Sq
     return result;
 }
 
+const getAllPiecesAttackingSquare = (state: BoardState, targetSquare: SquareState, pieceMap: Record<Piece, Set<SquareState>>) => {
+
+}
+
+
+const getValidationForPiece = (piece: Piece) => {
+    switch(piece) {
+        case 'pawn':
+            return isLegalPawnMove;
+        case 'knight':
+            return isLegalKnightMove;
+        case 'rook':
+            return isLegalRookMove;
+        case 'bishop':
+            return isLegalBishopMove;
+        case 'king':
+            return isLegalKingMove;
+        case 'queen':
+            return (state: BoardState, orig: Coordinates, dest: Coordinates) => {
+                return isLegalBishopMove(state, (orig), (dest))
+                || isLegalRookMove(state, (orig), (dest));
+            };
+    }
+}

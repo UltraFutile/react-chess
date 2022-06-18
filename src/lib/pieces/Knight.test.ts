@@ -29,7 +29,7 @@ describe.each([
         it.each([
             knightLegalDestinations.map((value) => { return {coordinates: value}; })
         ])("can move two squares and one diagonal to (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(origin, coordinates)).toBe(true);
+            expect(isLegalKnightMove(state, origin, coordinates)).toBe(true);
         });
     });
 
@@ -50,7 +50,7 @@ describe.each([
         it.each([
             knightLegalDestinations.map((value) => { return {coordinates: value}; })
         ])("can capture enemey pieces at (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(origin, coordinates)).toBe(true);
+            expect(isLegalKnightMove(state, origin, coordinates)).toBe(true);
         });
     });
 
@@ -68,7 +68,7 @@ describe.each([
         it.each([
             immediateSurroundingSquares.map((value) => { return {coordinates: value}; })
         ])("can't move to immediate square at (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(origin, coordinates)).toBe(false);
+            expect(isLegalKnightMove(state, origin, coordinates)).toBe(false);
         });
     });
 
@@ -85,7 +85,7 @@ describe.each([
         it.each([
             immediateSurroundingSquares.map((value) => { return {coordinates: value}; })
         ])("can't move only two squares to (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(origin, coordinates)).toBe(false);
+            expect(isLegalKnightMove(state, origin, coordinates)).toBe(false);
         });
     });
 
@@ -103,7 +103,7 @@ describe.each([
         it.each([
             immediateSurroundingSquares.map((value) => { return {coordinates: value}; })
         ])("can't move out of range to (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(origin, coordinates)).toBe(false);
+            expect(isLegalKnightMove(state, origin, coordinates)).toBe(false);
         });
     });
 })
