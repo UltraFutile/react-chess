@@ -18,7 +18,7 @@ import { onSquareClickFactory } from './ValidateBoardAction';
 export const Board = () => {
     const boardStateFactory = new BoardStateFactory();
     const boardState: BoardState = boardStateFactory.createBoardState();
-    boardStateFactory.setBoardPieces(boardState.squareGrid);
+    boardStateFactory.setBoardPieces(boardState);
     
     const [state, setBoardState] = React.useState<BoardState>(boardState);
 
@@ -35,7 +35,6 @@ export const Board = () => {
     }
 
     const renderSquares = () => {
-        console.log("render squares");
         const rows = [];
         for (let i = 0; i < state.fileNum; i++) {
             const row = [];

@@ -1,5 +1,6 @@
 import { BoardFile, BoardRank, Coordinates } from "../../types/AlgebraicNotation";
 import { Team } from "../Team";
+import { Piece } from "./PieceProps";
 import { SquareState } from "./SquareState";
 
 export interface BoardState {
@@ -8,6 +9,8 @@ export interface BoardState {
     squareGrid: SquareState[][];
     currentlySelectedSquare?: SquareState;
     whichTeamsTurn: Team;
+    whitePieceMap: Record<Piece, Set<SquareState>>;
+    blackPieceMap: Record<Piece, Set<SquareState>>;
 }
 
 const fileToIndexMap: Record<BoardFile, number> = {
@@ -81,7 +84,23 @@ export class BoardStateFactory {
             fileNum,
             rankNum,
             squareGrid,
-            whichTeamsTurn: Team.White
+            whichTeamsTurn: Team.White,
+            whitePieceMap: {
+                king: new Set<SquareState>(),
+                queen: new Set<SquareState>(),
+                bishop: new Set<SquareState>(),
+                knight:new Set<SquareState>(),
+                pawn: new Set<SquareState>(),
+                rook: new Set<SquareState>(),
+            },
+            blackPieceMap: {
+                king: new Set<SquareState>(),
+                queen: new Set<SquareState>(),
+                bishop: new Set<SquareState>(),
+                knight:new Set<SquareState>(),
+                pawn: new Set<SquareState>(),
+                rook: new Set<SquareState>(),
+            }
         }
     }
 
@@ -113,101 +132,46 @@ export class BoardStateFactory {
         return rows;
     }
 
-    setBoardPieces(squareArray: SquareState[][]) {
+    setBoardPieces(boardState: BoardState) {
+        const squareArray: SquareState[][] = boardState.squareGrid;
+
+        const setPiece = (square: SquareState, team: Team, piece: Piece) => {
+            square.piece = { team, piece };
+            if (team === Team.White) {
+                boardState.whitePieceMap[piece].add(square);
+            }
+            else {
+                boardState.blackPieceMap[piece].add(square);
+            }
+        }
+
         // White pieces
-        squareArray[0][0].piece = {
-            team: Team.White,
-            piece: 'rook'
-        }
-
-        squareArray[1][0].piece = {
-            team: Team.White,
-            piece: 'knight'
-        }
-
-        squareArray[2][0].piece = {
-            team: Team.White,
-            piece: 'bishop'
-        }
-
-        squareArray[3][0].piece = {
-            team: Team.White,
-            piece: 'queen'
-        }
-
-        squareArray[4][0].piece = {
-            team: Team.White,
-            piece: 'king'
-        }
-
-        squareArray[5][0].piece = {
-            team: Team.White,
-            piece: 'bishop'
-        }
-
-        squareArray[6][0].piece = {
-            team: Team.White,
-            piece: 'knight'
-        }
-
-        squareArray[7][0].piece = {
-            team: Team.White,
-            piece: 'rook'
-        }
+        setPiece(squareArray[0][0], Team.White, 'rook');
+        setPiece(squareArray[1][0], Team.White, 'knight');
+        setPiece(squareArray[2][0], Team.White, 'bishop');
+        setPiece(squareArray[3][0], Team.White, 'queen');
+        setPiece(squareArray[4][0], Team.White, 'king');
+        setPiece(squareArray[5][0], Team.White, 'bishop');
+        setPiece(squareArray[6][0], Team.White, 'knight');
+        setPiece(squareArray[7][0], Team.White, 'rook');
 
         for (let i = 0; i < 8; i++) {
-            squareArray[i][1].piece = {
-                team: Team.White,
-                piece: 'pawn'
-            }
+            setPiece(squareArray[i][1], Team.White, 'pawn');
         }
 
         // Black pieces
-        squareArray[0][7].piece = {
-            team: Team.Black,
-            piece: 'rook'
-        }
 
-        squareArray[1][7].piece = {
-            team: Team.Black,
-            piece: 'knight'
-        }
-
-        squareArray[2][7].piece = {
-            team: Team.Black,
-            piece: 'bishop'
-        }
-
-        squareArray[3][7].piece = {
-            team: Team.Black,
-            piece: 'queen'
-        }
-
-        squareArray[4][7].piece = {
-            team: Team.Black,
-            piece: 'king'
-        }
-
-        squareArray[5][7].piece = {
-            team: Team.Black,
-            piece: 'bishop'
-        }
-
-        squareArray[6][7].piece = {
-            team: Team.Black,
-            piece: 'knight'
-        }
-
-        squareArray[7][7].piece = {
-            team: Team.Black,
-            piece: 'rook'
-        }
+        setPiece(squareArray[0][7], Team.Black, 'rook');
+        setPiece(squareArray[1][7], Team.Black, 'knight');
+        setPiece(squareArray[2][7], Team.Black, 'bishop');
+        setPiece(squareArray[3][7], Team.Black, 'queen');
+        setPiece(squareArray[4][7], Team.Black, 'king');
+        setPiece(squareArray[5][7], Team.Black, 'bishop');
+        setPiece(squareArray[6][7], Team.Black, 'knight');
+        setPiece(squareArray[7][7], Team.Black, 'rook');
 
         for (let i = 0; i < 8; i++) {
-            squareArray[i][6].piece = {
-                team: Team.Black,
-                piece: 'pawn'
-            }
+            setPiece(squareArray[i][6], Team.Black, 'pawn');
         }
-    }
+    }    
 }
