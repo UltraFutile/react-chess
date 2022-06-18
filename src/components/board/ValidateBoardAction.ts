@@ -9,6 +9,7 @@ import { isLegalRookMove } from "../../lib/pieces/Rook";
 import { isLegalKingMove } from '../../lib/pieces/King';
 import { Team } from '../../lib/Team';
 import { destinationHasSameTeam } from '../../lib/pieces/PieceHelpers';
+import { PieceProps } from '../../lib/model/PieceProps';
 
 export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch<React.SetStateAction<BoardState>>) => 
     (fileIndex: number, rankIndex: number) => () => {
@@ -65,5 +66,113 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
             break;
     }
 
-    return isValidMove;
+    if (!isValidMove) {
+        return false;
+    }
+
+    const enemyPieceMap = state.whichTeamsTurn === Team.White ? state.blackPieceMap : state.whitePieceMap;
+
+    if (prevSquare.piece.piece === 'king') {
+        // check if any enemy piece can attack king's new position. (maybe move this to under isLegalKingMove?)
+        const doesMoveResultInCheck = simulateMove(state, prevSquare, nextSquare, () => {
+            // TODO: need access to pieces!
+            // map = {piece: squareState[]}
+            // map.keys.foreach OR map[piece].foreach
+            for (let square of enemyPieceMap['pawn']) {
+                if (isLegalPawnMove(state, getCoordinates(square), getCoordinates(nextSquare))) {
+                    console.log("Under attack by pawn")
+                    return true;
+                }
+            }
+
+            for (let square of enemyPieceMap['knight']) {
+                if (isLegalKnightMove(getCoordinates(square), getCoordinates(nextSquare))) {
+                    console.log("Under attack by knight")
+                    return true;
+                }
+            }
+
+            for (let square of enemyPieceMap['rook']) {
+                if (isLegalRookMove(state, getCoordinates(square), getCoordinates(nextSquare))) {
+                    console.log("Under attack by rook")
+                    return true;
+                }
+            }
+
+            for (let square of enemyPieceMap['bishop']) {
+                if (isLegalBishopMove(state, getCoordinates(square), getCoordinates(nextSquare))) {
+                    console.log("Under attack by bishop")
+                    return true;
+                }
+            }
+
+            for (let square of enemyPieceMap['king']) {
+                if (isLegalKingMove(getCoordinates(square), getCoordinates(nextSquare))) {
+                    console.log("Under attack by king")
+                    return true;
+                }
+            }
+
+            for (let square of enemyPieceMap['queen']) {
+                if (isLegalBishopMove(state, getCoordinates(square), getCoordinates(nextSquare))
+                || isLegalRookMove(state, getCoordinates(square), getCoordinates(nextSquare))) {
+                    console.log("Under attack by queen")
+                    return true;
+                }
+            }
+            return false;
+        })
+
+        return !doesMoveResultInCheck
+    }
+    else {
+        // check for possible discovered checks
+        //      this should involve temporarily performing the move, then check if enemy r/b/q can attack the king
+        return true;
+    }
 }
+
+
+// perform move
+// perform check => fcn()
+// revert move
+
+const simulateMove = (state: BoardState, prevSquare: SquareState, nextSquare: SquareState, validationFunction: () => boolean): boolean => {
+    if (prevSquare.piece == null) {
+        throw new Error("Attempted to simulate move without a moving piece.")
+    }
+
+    const teamPieceMap = state.whichTeamsTurn === Team.White ? state.whitePieceMap : state.blackPieceMap;
+    const enemyPieceMap = state.whichTeamsTurn === Team.White ? state.blackPieceMap : state.whitePieceMap;
+    
+    let capturedPiece: PieceProps | undefined;
+
+    if (nextSquare.piece) {
+        capturedPiece = nextSquare.piece;
+        enemyPieceMap[nextSquare.piece.piece].delete(nextSquare);
+    }
+
+    teamPieceMap[prevSquare.piece.piece].delete(prevSquare);
+    teamPieceMap[prevSquare.piece.piece].add(nextSquare);
+
+    nextSquare.piece = prevSquare.piece;
+
+    const result: boolean = validationFunction();
+
+    // revert move
+    prevSquare.piece = nextSquare.piece;
+
+    teamPieceMap[prevSquare.piece.piece].delete(nextSquare);
+    teamPieceMap[prevSquare.piece.piece].add(prevSquare);
+
+    if (capturedPiece) {
+        nextSquare.piece = capturedPiece;
+        enemyPieceMap[nextSquare.piece.piece].add(nextSquare);
+    }
+    else {
+        nextSquare.piece = undefined;
+    }
+
+    return result;
+}
+
