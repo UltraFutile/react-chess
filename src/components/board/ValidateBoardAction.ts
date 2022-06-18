@@ -70,6 +70,7 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
         return false;
     }
 
+    const teamPieceMap = state.whichTeamsTurn === Team.White ? state.whitePieceMap : state.blackPieceMap;
     const enemyPieceMap = state.whichTeamsTurn === Team.White ? state.blackPieceMap : state.whitePieceMap;
 
     if (prevSquare.piece.piece === 'king') {
@@ -128,7 +129,35 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
     else {
         // check for possible discovered checks
         //      this should involve temporarily performing the move, then check if enemy r/b/q can attack the king
-        return true;
+        const kingSquare: SquareState = teamPieceMap['king'].values().next().value;
+        console.log(kingSquare);
+        const doesMoveResultInCheck = simulateMove(state, prevSquare, nextSquare, () => {
+            for (let square of enemyPieceMap['rook']) {
+                if (isLegalRookMove(state, getCoordinates(square), getCoordinates(kingSquare))) {
+                    console.log("Under attack by rook")
+                    return true;
+                }
+            }
+            
+            for (let square of enemyPieceMap['bishop']) {
+                if (isLegalBishopMove(state, getCoordinates(square), getCoordinates(kingSquare))) {
+                    console.log("Under attack by bishop")
+                    return true;
+                }
+            }
+
+            for (let square of enemyPieceMap['queen']) {
+                if (isLegalBishopMove(state, getCoordinates(square), getCoordinates(kingSquare))
+                || isLegalRookMove(state, getCoordinates(square), getCoordinates(kingSquare))) {
+                    console.log("Under attack by queen")
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        return !doesMoveResultInCheck;
     }
 }
 
@@ -156,6 +185,7 @@ const simulateMove = (state: BoardState, prevSquare: SquareState, nextSquare: Sq
     teamPieceMap[prevSquare.piece.piece].add(nextSquare);
 
     nextSquare.piece = prevSquare.piece;
+    prevSquare.piece = undefined;
 
     const result: boolean = validationFunction();
 
