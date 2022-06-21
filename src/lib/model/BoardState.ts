@@ -20,6 +20,10 @@ const fileToIndexMap: Record<BoardFile, number> = {
 const fileToIndex = (file: BoardFile): number => fileToIndexMap[file];
 const rankToIndex = (rank: BoardRank): number => rank - 1;
 
+export function getSquare(state: BoardState, [file, rank]: [number, number]) {
+    return state.squareGrid[file][rank]
+}
+
 export function getMoveDiff(
     [originFileIndex, originRankIndex]: [number, number], 
     [destFileIndex, destRankIndex]: [number, number]) 
