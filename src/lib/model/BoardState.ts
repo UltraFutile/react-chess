@@ -16,63 +16,48 @@ export interface BoardState {
 const fileToIndexMap: Record<BoardFile, number> = {
     'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7
 }
-const indexToFileMap: Record<number, BoardFile> = {
-    0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h'
-}
 
 const fileToIndex = (file: BoardFile): number => fileToIndexMap[file];
-const indexToFile = (index: number): BoardFile => indexToFileMap[index];
 const rankToIndex = (rank: BoardRank): number => rank - 1;
-const indexToRank = (index: number): BoardRank => (index + 1) as BoardRank;
 
-export function getMovement(orig: Coordinates, dest: Coordinates) : [number, number] {
+export function getMoveDiff(
+    [originFileIndex, originRankIndex]: [number, number], 
+    [destFileIndex, destRankIndex]: [number, number]) 
+    : [number, number] {
     return [
-        fileToIndex(dest[0]) - fileToIndex(orig[0]), 
-        rankToIndex(dest[1]) - rankToIndex(orig[1])
+        destFileIndex - originFileIndex, 
+        destRankIndex - originRankIndex
     ];
 }
 
 export function getDestination(
     boardState: BoardState, 
-    orig: Coordinates, 
-    delta: {file?: number, rank?: number}): Coordinates {
-    let file: BoardFile;
+    [origFile, origRank]: [number, number], 
+    delta: {file?: number, rank?: number}): [number, number] {
+    let file: number;
     if (delta.file) {
-        let fileIndex: number = fileToIndex(orig[0]) + delta.file;
+        let fileIndex: number = origFile + delta.file;
         if (fileIndex < 0 || fileIndex >= boardState.fileNum)
             throw new Error(`Invald destination file ${fileIndex}`);
-        file = indexToFile(fileIndex);
+        file = fileIndex;
     }
     else {
-        file = orig[0];
+        file = origFile;
     }
 
-    let rank: BoardRank;
+    let rank: number;
     if (delta.rank) {
-        let rankIndex: number = rankToIndex(orig[1]) + delta.rank;
+        let rankIndex: number = origRank + delta.rank;
         if (rankIndex < 0 || rankIndex >= boardState.rankNum)
             throw new Error(`Invald destination rank ${rankIndex}`);    
-        rank = indexToRank(rankIndex);
+        rank = rankIndex;
     }
     else {
-        rank = orig[1];
+        rank = origRank;
     }
     
     return [file, rank];
 }
-
-export function getSquare(boardState: BoardState, coordinates: Coordinates): SquareState {
-    return boardState.squareGrid[fileToIndexMap[coordinates[0]]][rankToIndex(coordinates[1])];
-}
-
-export function getCoordinates(square: SquareState): Coordinates {
-    return [indexToFile(square.file), indexToRank(square.rank)];
-}
-
-export function getCoordinatesFromIndexes(fileIndex: number, rankIndex: number): Coordinates {
-    return [indexToFile(fileIndex), indexToRank(rankIndex)];
-}
-
 export function getIndexesFromCoordinates(coordinates: Coordinates): [number, number] {
     return [fileToIndex(coordinates[0]), rankToIndex(coordinates[1])];
 }

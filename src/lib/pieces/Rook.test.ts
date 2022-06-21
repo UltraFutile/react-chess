@@ -1,6 +1,5 @@
 import { addPiece } from "../../components/board/ManagePiece";
-import { Coordinates } from "../../types/AlgebraicNotation";
-import { BoardState, BoardStateFactory, getCoordinatesFromIndexes, getDestination } from "../model/BoardState";
+import { BoardState, BoardStateFactory, getDestination, getIndexesFromCoordinates } from "../model/BoardState";
 import { Team } from "../Team";
 import { isLegalRookMove } from "./Rook";
 
@@ -16,7 +15,7 @@ describe.each([
     });
 
     describe("legal move range", () => {
-        const origin: Coordinates = ['e', 4];
+        const origin = getIndexesFromCoordinates(['e', 4]);
 
         beforeEach(() => {
             addPiece(state, thisTeam, 'rook', origin);
@@ -26,20 +25,20 @@ describe.each([
             for (let i = 0; i < state.rankNum; i++) {
                 if (i === 3)
                     continue;
-                expect(isLegalRookMove(state, origin, getCoordinatesFromIndexes(4, i))).toBe(true);
+                expect(isLegalRookMove(state, origin, [4, i])).toBe(true);
             }
         });
         it("can move to any square on the same rank", () => {
             for (let i = 0; i < state.fileNum; i++) {
                 if (i === 4)
                     continue;
-                expect(isLegalRookMove(state, origin, getCoordinatesFromIndexes(i, 3))).toBe(true);
+                expect(isLegalRookMove(state, origin, [i, 3])).toBe(true);
             }
         });
     });
 
     describe("movement with obstacles", () => {
-        const origin: Coordinates = ['e', 4];
+        const origin = getIndexesFromCoordinates(['e', 4]);
 
         beforeEach(() => {
             addPiece(state, thisTeam, 'rook', origin);

@@ -1,4 +1,3 @@
-import { Coordinates } from "../../types/AlgebraicNotation";
 import { diagonalMovementGenerator, straightMovementGenerator } from "../BoardIterators";
 import { BoardState } from "../model/BoardState";
 import { SquareState } from "../model/SquareState";
@@ -8,7 +7,7 @@ export function destinationHasSameTeam (origTeam: Team, dest: SquareState) {
     return dest.piece && dest.piece.team === origTeam;
 }
 
-export function isClearStraightPath(state: BoardState, orig: Coordinates, dest: Coordinates): boolean {
+export function isClearStraightPath(state: BoardState, orig: [number, number], dest: [number, number]): boolean {
     const squareIterator = straightMovementGenerator(state, orig, dest);
     for (const square of squareIterator) {
         if (square.piece)
@@ -17,7 +16,7 @@ export function isClearStraightPath(state: BoardState, orig: Coordinates, dest: 
     return true;
 }
 
-export function isClearDiagonalPath(state: BoardState, orig: Coordinates, dest: Coordinates): boolean {
+export function isClearDiagonalPath(state: BoardState, orig: [number, number], dest: [number, number]): boolean {
     const diagonalIterator = diagonalMovementGenerator(state, orig, dest);
     for (const square of diagonalIterator) {
         if (square.piece)

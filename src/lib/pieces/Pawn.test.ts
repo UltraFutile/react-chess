@@ -1,6 +1,6 @@
 import { addPiece } from '../../components/board/ManagePiece';
-import { BoardRank, Coordinates } from '../../types/AlgebraicNotation';
-import { BoardState, BoardStateFactory, getDestination } from '../model/BoardState';
+import { BoardRank } from '../../types/AlgebraicNotation';
+import { BoardState, BoardStateFactory, getDestination, getIndexesFromCoordinates } from '../model/BoardState';
 import { Team } from '../Team';
 import { isLegalPawnMove } from './Pawn';
 
@@ -18,7 +18,7 @@ describe.each([
     });
 
     describe("movement from starting position", () => {
-        const origin: Coordinates = ['e', startingRank];
+        const origin = getIndexesFromCoordinates(['e', startingRank]);
     
         beforeEach(() => {
             addPiece(state, thisTeam, 'pawn', origin);
@@ -34,7 +34,7 @@ describe.each([
     });
 
     describe('movement after starting postiion', () => {
-        const origin: Coordinates = ['e', startingRank + (1 * rankDirection) as BoardRank];
+        const origin = getIndexesFromCoordinates(['e', startingRank + (1 * rankDirection) as BoardRank]);
     
         beforeEach(() => {
             addPiece(state, thisTeam, 'pawn', origin);
@@ -50,7 +50,7 @@ describe.each([
     });
     
     describe('illegal movement range', () => {
-        const origin: Coordinates = ['e', startingRank + (1 * rankDirection) as BoardRank];
+        const origin = getIndexesFromCoordinates(['e', startingRank + (1 * rankDirection) as BoardRank]);
     
         beforeEach(() => {
             addPiece(state, thisTeam, 'pawn', origin);
@@ -75,7 +75,7 @@ describe.each([
     });
 
     describe('illegal captures', () => {
-        const origin: Coordinates = ['e', startingRank + (1 * rankDirection) as BoardRank];
+        const origin = getIndexesFromCoordinates(['e', startingRank + (1 * rankDirection) as BoardRank]);
     
         beforeEach(() => {
             addPiece(state, thisTeam, 'pawn', origin);
@@ -90,7 +90,7 @@ describe.each([
     });
     
     describe('legal captures', () => {
-        const origin: Coordinates = ['e', startingRank + (1 * rankDirection) as BoardRank];
+        const origin = getIndexesFromCoordinates(['e', startingRank + (1 * rankDirection) as BoardRank]);
     
         beforeEach(() => {
             addPiece(state, thisTeam, 'pawn', origin);
@@ -105,7 +105,7 @@ describe.each([
     });
 
     describe('movement with obstacles at starting position', () => {
-        const origin: Coordinates = ['e', startingRank];
+        const origin = getIndexesFromCoordinates(['e', startingRank]);
 
         describe("with only immediate obstacle", () => {
             beforeEach(() => {

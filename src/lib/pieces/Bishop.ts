@@ -1,9 +1,8 @@
-import { Coordinates } from "../../types/AlgebraicNotation";
-import { BoardState, getMovement } from "../model/BoardState";
+import { BoardState, getMoveDiff } from "../model/BoardState";
 import { isClearDiagonalPath } from "./PieceHelpers";
 
-export function isLegalBishopMove(boardState: BoardState, orig: Coordinates, dest: Coordinates) {
-    const [fileMovement, rankMovement] = getMovement(orig, dest);
+export function isLegalBishopMove(state: BoardState, orig: [number, number], dest: [number, number]) {
+    const [fileMovement, rankMovement] = getMoveDiff(orig, dest);
     const isMovingDiagonally = Math.abs(fileMovement) == Math.abs(rankMovement);
-    return isMovingDiagonally && isClearDiagonalPath(boardState, orig, dest);
+    return isMovingDiagonally && isClearDiagonalPath(state, orig, dest);
 }

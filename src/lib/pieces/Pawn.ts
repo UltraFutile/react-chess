@@ -1,15 +1,15 @@
-import { BoardRank, Coordinates } from "../../types/AlgebraicNotation";
-import { BoardState, getDestination, getMovement, getSquare } from "../model/BoardState";
+import { BoardRank } from "../../types/AlgebraicNotation";
+import { BoardState, getDestination, getMoveDiff } from "../model/BoardState";
 import { SquareState } from "../model/SquareState";
 import { Team } from "../Team";
 
 const MAX_PAWN_VERTICAL_RANGE: number = 2;
-const WHITE_PAWN_START_RANK: BoardRank = 2;
-const BLACK_PAWN_START_RANK: BoardRank = 7;
+const WHITE_PAWN_START_RANK: BoardRank = 1;
+const BLACK_PAWN_START_RANK: BoardRank = 6;
 
-export function isLegalPawnMove(boardState: BoardState, orig: Coordinates, dest: Coordinates): boolean {
-    const origin: SquareState = getSquare(boardState, orig);
-    const destination: SquareState = getSquare(boardState, dest);
+export function isLegalPawnMove(state: BoardState, [origFile, origRank]: [number, number], [destFile, destRank]: [number, number]): boolean {
+    const origin: SquareState = state.squareGrid[origFile][origRank];
+    const destination: SquareState = state.squareGrid[destFile][destRank];
 
     if (origin.piece == null) {
         throw new Error(`Square at (${origin.file}, ${origin.rank}) does not have a piece!`)
@@ -19,7 +19,7 @@ export function isLegalPawnMove(boardState: BoardState, orig: Coordinates, dest:
     const rankDirection: number = originTeam === Team.White ? 1 : -1;
     const startingRank: BoardRank = originTeam === Team.White ? WHITE_PAWN_START_RANK : BLACK_PAWN_START_RANK;
 
-    const [fileMovement, rankMovement] = getMovement(orig, dest);
+    const [fileMovement, rankMovement] = getMoveDiff([origFile, origRank], [destFile, destRank]);
 
     if (isMovingInWrongDirection(originTeam, rankMovement))
         return false;
@@ -40,11 +40,12 @@ export function isLegalPawnMove(boardState: BoardState, orig: Coordinates, dest:
             return false;
     }
     else {
-        if (rankMagnitude === MAX_PAWN_VERTICAL_RANGE && (orig[1] !== startingRank || destination.piece))
+        if (rankMagnitude === MAX_PAWN_VERTICAL_RANGE && (origRank !== startingRank || destination.piece))
             return false;
             
         // if there's any piece in front of pawn, move is illegal
-        const immediateSquare = getSquare(boardState, getDestination(boardState, orig, { rank: 1 * rankDirection }));
+        const dest = getDestination(state, [origFile, origRank], { rank: 1 * rankDirection });
+        const immediateSquare = state.squareGrid[dest[0]][dest[1]]; 
         if (immediateSquare.piece)
             return false;
     }

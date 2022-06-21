@@ -1,8 +1,7 @@
-import { Coordinates } from "../../types/AlgebraicNotation";
-import { BoardState, getMovement } from "../model/BoardState";
+import { BoardState, getMoveDiff } from "../model/BoardState";
 
-export function isLegalKnightMove(state: BoardState, orig: Coordinates, dest: Coordinates) {
-    const [fileMovement, rankMovement] = getMovement(orig, dest);
+export function isLegalKnightMove(state: BoardState, orig: [number, number], dest: [number, number]) {
+    const [fileMovement, rankMovement] = getMoveDiff(orig, dest);
     const fileMagnitude: number = Math.abs(fileMovement);
     const rankMagnitude: number = Math.abs(rankMovement);
 

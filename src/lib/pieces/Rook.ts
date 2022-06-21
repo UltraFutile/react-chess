@@ -1,9 +1,8 @@
-import { Coordinates } from "../../types/AlgebraicNotation";
-import { BoardState, getMovement } from "../model/BoardState";
+import { BoardState, getMoveDiff } from "../model/BoardState";
 import { isClearStraightPath } from "./PieceHelpers";
 
-export function isLegalRookMove(boardState: BoardState, orig: Coordinates, dest: Coordinates): boolean {
-    const [fileMove, rankMove] = getMovement(orig, dest);
+export function isLegalRookMove(state: BoardState, orig: [number, number], dest: [number, number]): boolean {
+    const [fileMove, rankMove] = getMoveDiff(orig, dest);
     const isMovingStraight = fileMove * rankMove === 0 && fileMove + rankMove !== 0;
-    return isMovingStraight && isClearStraightPath(boardState, orig, dest);
+    return isMovingStraight && isClearStraightPath(state, orig, dest);
 }

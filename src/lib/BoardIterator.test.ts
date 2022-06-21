@@ -1,11 +1,10 @@
-import { Coordinates } from "../types/AlgebraicNotation";
 import { diagonalMovementGenerator, straightMovementGenerator } from "./BoardIterators";
-import { BoardStateFactory, BoardState, getDestination } from "./model/BoardState";
+import { BoardStateFactory, BoardState, getIndexesFromCoordinates, getDestination } from "./model/BoardState";
 
 describe("test board iterators", () => {
     const boardFactory: BoardStateFactory = new BoardStateFactory();
     let state: BoardState;
-    const origin: Coordinates = ['e', 4];
+    const origin = getIndexesFromCoordinates(['e', 4])
 
     beforeEach(() => {
         state = boardFactory.createBoardState();

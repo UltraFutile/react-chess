@@ -1,6 +1,6 @@
 import { addPiece } from "../../components/board/ManagePiece";
 import { Coordinates } from "../../types/AlgebraicNotation";
-import { BoardStateFactory, BoardState } from "../model/BoardState";
+import { BoardStateFactory, BoardState, getIndexesFromCoordinates } from "../model/BoardState";
 import { Team } from "../Team";
 import { isLegalKnightMove } from "./Knight";
 
@@ -16,7 +16,7 @@ describe.each([
     });
 
     describe("legal basic moves", () => {
-        const origin: Coordinates = ['e', 4];
+        const origin = getIndexesFromCoordinates(['e', 4]);
         const knightLegalDestinations: Coordinates[] = [
             ['f', 6], ['g', 5], ['g', 3], ['f', 2], 
             ['d', 2], ['c', 3], ['c', 5], ['d', 6]
@@ -29,12 +29,12 @@ describe.each([
         it.each([
             knightLegalDestinations.map((value) => { return {coordinates: value}; })
         ])("can move two squares and one diagonal to (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(state, origin, coordinates)).toBe(true);
+            expect(isLegalKnightMove(state, origin, getIndexesFromCoordinates(coordinates))).toBe(true);
         });
     });
 
     describe("legal captures", () => {
-        const origin: Coordinates = ['e', 4];
+        const origin = getIndexesFromCoordinates(['e', 4]);
         const knightLegalDestinations: Coordinates[] = [
             ['f', 6], ['g', 5], ['g', 3], ['f', 2], 
             ['d', 2], ['c', 3], ['c', 5], ['d', 6]
@@ -43,19 +43,19 @@ describe.each([
         beforeEach(() => {
             addPiece(state, thisTeam, 'knight', origin);
             knightLegalDestinations.forEach((value: Coordinates) => {
-                addPiece(state, otherTeam, 'pawn',  value);
+                addPiece(state, otherTeam, 'pawn', getIndexesFromCoordinates(value));
             });
         });
         
         it.each([
             knightLegalDestinations.map((value) => { return {coordinates: value}; })
         ])("can capture enemey pieces at (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(state, origin, coordinates)).toBe(true);
+            expect(isLegalKnightMove(state, origin, getIndexesFromCoordinates(coordinates))).toBe(true);
         });
     });
 
     describe("illegal short moves", () => {
-        const origin: Coordinates = ['e', 4];
+        const origin = getIndexesFromCoordinates(['e', 4]);
         const immediateSurroundingSquares: Coordinates[] = [
             ['e', 5], ['f', 5], ['f', 4], ['f', 3], 
             ['e', 3], ['d', 3], ['d', 4], ['d', 5 ]
@@ -68,12 +68,12 @@ describe.each([
         it.each([
             immediateSurroundingSquares.map((value) => { return {coordinates: value}; })
         ])("can't move to immediate square at (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(state, origin, coordinates)).toBe(false);
+            expect(isLegalKnightMove(state, origin, getIndexesFromCoordinates(coordinates))).toBe(false);
         });
     });
 
     describe("illegal straight 2 square moves", () => {
-        const origin: Coordinates = ['e', 4];
+        const origin = getIndexesFromCoordinates(['e', 4]);
         const immediateSurroundingSquares: Coordinates[] = [
             ['e', 6], ['g', 4], ['e', 2], ['c', 4],
         ];
@@ -85,12 +85,12 @@ describe.each([
         it.each([
             immediateSurroundingSquares.map((value) => { return {coordinates: value}; })
         ])("can't move only two squares to (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(state, origin, coordinates)).toBe(false);
+            expect(isLegalKnightMove(state, origin, getIndexesFromCoordinates(coordinates))).toBe(false);
         });
     });
 
     describe("illegal destinations immediately out of range", () => {
-        const origin: Coordinates = ['e', 4];
+        const origin = getIndexesFromCoordinates(['e', 4]);
         const immediateSurroundingSquares: Coordinates[] = [
             ['e', 7], ['g', 6], ['h', 4], ['g', 2], 
             ['e', 1], ['c', 2], ['b', 4], ['c', 6],
@@ -103,7 +103,7 @@ describe.each([
         it.each([
             immediateSurroundingSquares.map((value) => { return {coordinates: value}; })
         ])("can't move out of range to (%j)", ({ coordinates }) => {
-            expect(isLegalKnightMove(state, origin, coordinates)).toBe(false);
+            expect(isLegalKnightMove(state, origin, getIndexesFromCoordinates(coordinates))).toBe(false);
         });
     });
 })
