@@ -18,18 +18,15 @@ export const simulateMove = (
     const currentTeam = prevSquare.piece.team;
     const enemyTeam: Team = currentTeam === Team.White ? Team.Black : Team.White;
 
-    const teamPieceMap = state.teamManager.getPieceMap(currentTeam);
-    const enemyPieceMap = state.teamManager.getPieceMap(enemyTeam);
-
     let capturedPiece: PieceProps | undefined;
 
     if (nextSquare.piece) {
         capturedPiece = nextSquare.piece;
-        enemyPieceMap[nextSquare.piece.piece].delete(nextSquare);
+        state.teamManager.removePiece(enemyTeam, nextSquare.piece.piece, nextSquare);
     }
 
-    teamPieceMap[prevSquare.piece.piece].delete(prevSquare);
-    teamPieceMap[prevSquare.piece.piece].add(nextSquare);
+    state.teamManager.removePiece(currentTeam, prevSquare.piece.piece, prevSquare);
+    state.teamManager.addPiece(currentTeam, prevSquare.piece.piece, nextSquare);
 
     // capture
     nextSquare.piece = prevSquare.piece;
@@ -40,20 +37,16 @@ export const simulateMove = (
     // revert move
     prevSquare.piece = nextSquare.piece;
 
-    teamPieceMap[prevSquare.piece.piece].delete(nextSquare);
-    teamPieceMap[prevSquare.piece.piece].add(prevSquare);
+    state.teamManager.removePiece(currentTeam, prevSquare.piece.piece, nextSquare);
+    state.teamManager.addPiece(currentTeam, prevSquare.piece.piece, prevSquare);
 
     if (capturedPiece) {
         nextSquare.piece = capturedPiece;
-        enemyPieceMap[nextSquare.piece.piece].add(nextSquare);
+        state.teamManager.addPiece(enemyTeam, nextSquare.piece.piece, nextSquare);
     }
     else {
         nextSquare.piece = undefined;
 
-    }
-
-    if (teamPieceMap['king'].size > 1 || enemyPieceMap['king'].size > 1) {
-        console.log("More than one king");
     }
 
     return result;

@@ -16,11 +16,11 @@ export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch
     const sameSquareSelected = nextSquare.selected;
 
     if (prevSquare == null 
-        && (nextSquare.piece == null || nextSquare.piece.team !== state.whichTeamsTurn)) {
+        && (nextSquare.piece == null || !state.teamManager.isTeamsTurn(nextSquare.piece.team))) {
         return;
     }
     
-    if (sameSquareSelected || teamPieceSelected(nextSquare, state.whichTeamsTurn)) {
+    if (sameSquareSelected || teamPieceSelected(nextSquare, state.teamManager.attackingTeam)) {
         setState(toggleSquareSelect(state, fileIndex, rankIndex));
     }
     else if (validateMove(state, prevSquare, nextSquare)) {
@@ -30,10 +30,8 @@ export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch
         // Check for checkmate OR stalemate
         
         // Get all team pieces attacking enemy king. (nextsquare piece, and then check  r/b/q)
-        const teamPieceMap = newState.teamManager.getPieceMap(newState.whichTeamsTurn);
-        const enemyTeam: Team = newState.whichTeamsTurn === Team.White ? Team.Black : Team.White;
-        const enemyKingSquare: SquareState = state.teamManager.getKing(enemyTeam);
-        const enemyKingAttackers = getAllPiecesAttackingSquare(newState, enemyKingSquare, newState.whichTeamsTurn);
+        const enemyKingSquare: SquareState = state.teamManager.getKing(newState.teamManager.defendingTeam);
+        const enemyKingAttackers = getAllPiecesAttackingSquare(newState, enemyKingSquare, newState.teamManager.attackingTeam);
 
         if (enemyKingAttackers.length > 0) {
             console.log("There are pieces attacking the king")
@@ -45,7 +43,7 @@ export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch
             // For each possible enemy king move, 
             // simulate it and validate with all team pieces
             for (let enemyKingMove of kingPossibleMoves) {
-                const squareIsVulnerable = squareCanBeAttacked(newState, enemyKingMove, teamPieceMap, enemyKingSquare);
+                const squareIsVulnerable = canSquareBeAttacked(newState, enemyKingMove, newState.teamManager.attackingTeam, enemyKingSquare);
                 if (!squareIsVulnerable) {
                     console.log(`Not checkmate, king can move to ${enemyKingMove.file}, ${enemyKingMove.rank}`)
                 }
@@ -65,26 +63,6 @@ export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch
     }
 };
 
-const squareCanBeAttacked = (
-    state: BoardState, 
-    target: SquareState, 
-    pieceMap: Record<Piece, Set<SquareState>>,
-    prevSquare: SquareState) => {
-    let piece: Piece;
-    for (piece in pieceMap) {
-        const validate = getValidationForPiece(piece);
-        const pieces = Array.from(pieceMap[piece]);
-
-        for (let square of pieces) {
-            const validMove = simulateMove(state, prevSquare, target, () => validate(state, [square.file, square.rank], [target.file, target.rank]));
-            console.log(`Validate move by ${piece} from ${square.file}, ${square.rank} to ${target.file}, ${target.rank}, result ${validMove}`);
-            if (validMove)
-                return true;
-        }
-    }
-
-    return false;
-}
 
 
 const teamPieceSelected = (nextSquare: SquareState, currentTeam: Team) => {
@@ -106,62 +84,72 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
         return false;
     }
 
-
-    const enemyTeam: Team = state.whichTeamsTurn === Team.White ? Team.Black : Team.White;
-    const enemyPieceMap = state.teamManager.getPieceMap(enemyTeam);
-
-
     if (prevSquare.piece.piece === 'king') {
         // check if any enemy piece can attack king's new position. (maybe move this to under isLegalKingMove?)
-        const doesMoveResultInCheck = simulateMove(state, prevSquare, nextSquare, () => {
-            let piece: keyof typeof enemyPieceMap;
-            for (piece in enemyPieceMap) {
-                for (let square of enemyPieceMap[piece]) {
-                    if (getValidationForPiece(piece)(state, [square.file, square.rank], [nextSquare.file, nextSquare.rank])) {
-                        console.log("Under attack by " + piece);
-                        return true;
-                    }
-                }
-            }
-            return false;
-        })
-
+        const doesMoveResultInCheck = simulateMove(state, prevSquare, nextSquare, 
+            isSquareUnderAttack(state, nextSquare, state.teamManager.defendingTeam));
         return !doesMoveResultInCheck
     }
     else {
         // check for possible discovered checks
-        //      this should involve temporarily performing the move, then check if enemy r/b/q can attack the king
-        const kingSquare: SquareState = state.teamManager.getKing(state.whichTeamsTurn);
+        // this should involve temporarily performing the move, then check if enemy r/b/q can attack the king
+        const kingSquare: SquareState = state.teamManager.getKing(state.teamManager.attackingTeam);
         console.log(kingSquare);
-        const doesMoveResultInCheck = simulateMove(state, prevSquare, nextSquare, () => {
-            let piecesThatCanDiscoverCheck: Piece[] = ['rook', 'bishop', 'queen'];
-            for (let piece of piecesThatCanDiscoverCheck) {
-                for (let square of enemyPieceMap[piece]) {
-                    if (getValidationForPiece(piece)(state, [square.file, square.rank], [kingSquare.file, kingSquare.rank])) {
-                        console.log("Under attack by " + piece);
-                        return true;
-                    }
-                }
-            }
-            return false;
-        });
+        const doesMoveResultInCheck = simulateMove(state, prevSquare, nextSquare, 
+            isSquareUnderAttack(state, kingSquare, state.teamManager.defendingTeam, ['rook', 'bishop', 'queen']));
 
         return !doesMoveResultInCheck;
     }
 }
 
+const canSquareBeAttacked = (
+    state: BoardState, 
+    target: SquareState, 
+    attackingTeam: Team,
+    prevSquare: SquareState): boolean => {
+    const pieceIterator = state.teamManager.getPieceIterator(attackingTeam);
+    for (const square of pieceIterator) {
+        if (square.piece == null) {
+            continue;
+        }
+        const validate = getValidationForPiece(square.piece.piece);
+        const validMove = simulateMove(state, prevSquare, target, () => validate(state, [square.file, square.rank], [target.file, target.rank]));
+        console.log(`Validate move by ${square.piece.piece} from ${square.file}, ${square.rank} to ${target.file}, ${target.rank}, result ${validMove}`);
+            if (validMove)
+                return true;
+    }
 
-const getAllPiecesAttackingSquare = (state: BoardState, targetSquare: SquareState, attackingTeam: Team): Piece[] => {
-    const pieceMap = state.teamManager.getPieceMap(attackingTeam);
-    const pieces: Piece[] = [];
-    let piece: Piece;
-    for (piece in pieceMap) {
-        for (let square of pieceMap[piece]) {
-            if (getValidationForPiece(piece)(state, [square.file, square.rank], [targetSquare.file, targetSquare.rank])) {
-                console.log("Under attack by " + piece);
-                pieces.push(piece) // what for?
-            }
+    return false;
+}
+
+
+const isSquareUnderAttack = (state: BoardState, targetSquare: SquareState, attackingTeam: Team, attackingPieces?: Piece[]) => (): boolean => {
+    const pieceIterator = state.teamManager.getPieceIterator(attackingTeam, attackingPieces);
+    for (const square of pieceIterator) {
+        if (square.piece == null) {
+            continue;
+        }
+        if (getValidationForPiece(square.piece.piece)(state, [square.file, square.rank], [targetSquare.file, targetSquare.rank])) {
+            console.log("Under attack by " + square.piece.piece);
+            return true;
         }
     }
+
+    return false;
+}
+
+const getAllPiecesAttackingSquare = (state: BoardState, targetSquare: SquareState, attackingTeam: Team): Piece[] => {
+    const pieces: Piece[] = [];
+    const pieceIterator = state.teamManager.getPieceIterator(attackingTeam);
+    for (const square of pieceIterator) {
+        if (square.piece == null) {
+            continue;
+        }
+        if (getValidationForPiece(square.piece.piece)(state, [square.file, square.rank], [targetSquare.file, targetSquare.rank])) {
+            console.log("Under attack by " + square.piece.piece);
+            pieces.push(square.piece.piece);
+        }
+    }
+
     return pieces;
 }

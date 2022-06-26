@@ -9,7 +9,6 @@ export interface BoardState {
     rankNum: number;
     squareGrid: SquareState[][];
     currentlySelectedSquare?: SquareState;
-    whichTeamsTurn: Team;
     teamManager: TeamManager;
 }
 
@@ -73,7 +72,6 @@ export class BoardStateFactory {
             fileNum,
             rankNum,
             squareGrid,
-            whichTeamsTurn: Team.White,
             teamManager: new TeamManager()
         }
     }
