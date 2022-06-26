@@ -16,9 +16,10 @@ export const simulateMove = (
     }
     // Get team of moving piece
     const currentTeam = prevSquare.piece.team;
+    const enemyTeam: Team = currentTeam === Team.White ? Team.Black : Team.White;
 
-    const teamPieceMap = currentTeam === Team.White ? state.whitePieceMap : state.blackPieceMap;
-    const enemyPieceMap = currentTeam === Team.White ? state.blackPieceMap : state.whitePieceMap;
+    const teamPieceMap = state.teamManager.getPieceMap(currentTeam);
+    const enemyPieceMap = state.teamManager.getPieceMap(enemyTeam);
 
     let capturedPiece: PieceProps | undefined;
 

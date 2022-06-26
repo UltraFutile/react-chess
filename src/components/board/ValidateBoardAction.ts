@@ -30,12 +30,11 @@ export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch
         // Check for checkmate OR stalemate
         
         // Get all team pieces attacking enemy king. (nextsquare piece, and then check  r/b/q)
-        const teamPieceMap = newState.whichTeamsTurn === Team.White ? newState.whitePieceMap : newState.blackPieceMap;
-        const enemyPieceMap = newState.whichTeamsTurn === Team.White ? newState.blackPieceMap : newState.whitePieceMap;
-        const enemyKingSquare: SquareState = enemyPieceMap['king'].values().next().value;
-        const enemyKingAttackers = getAllPiecesAttackingSquare(newState, enemyKingSquare, teamPieceMap);
+        const teamPieceMap = newState.teamManager.getPieceMap(newState.whichTeamsTurn);
+        const enemyTeam: Team = newState.whichTeamsTurn === Team.White ? Team.Black : Team.White;
+        const enemyKingSquare: SquareState = state.teamManager.getKing(enemyTeam);
+        const enemyKingAttackers = getAllPiecesAttackingSquare(newState, enemyKingSquare, newState.whichTeamsTurn);
 
-        
         if (enemyKingAttackers.length > 0) {
             console.log("There are pieces attacking the king")
             console.log(enemyKingAttackers);
@@ -55,12 +54,10 @@ export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch
             // Is there more than one piece attacking the king? -> true
             // - Can the piece attacking the king be captured?
             // - Can the piece attacking the king be blocked?
-
         }
         else {
             // no pieces attacking king? => check for stalemate
         }
-
 
         changeTurn(newState);
         setState(newState);
@@ -109,8 +106,10 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
         return false;
     }
 
-    const teamPieceMap = state.whichTeamsTurn === Team.White ? state.whitePieceMap : state.blackPieceMap;
-    const enemyPieceMap = state.whichTeamsTurn === Team.White ? state.blackPieceMap : state.whitePieceMap;
+
+    const enemyTeam: Team = state.whichTeamsTurn === Team.White ? Team.Black : Team.White;
+    const enemyPieceMap = state.teamManager.getPieceMap(enemyTeam);
+
 
     if (prevSquare.piece.piece === 'king') {
         // check if any enemy piece can attack king's new position. (maybe move this to under isLegalKingMove?)
@@ -132,7 +131,7 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
     else {
         // check for possible discovered checks
         //      this should involve temporarily performing the move, then check if enemy r/b/q can attack the king
-        const kingSquare: SquareState = teamPieceMap['king'].values().next().value;
+        const kingSquare: SquareState = state.teamManager.getKing(state.whichTeamsTurn);
         console.log(kingSquare);
         const doesMoveResultInCheck = simulateMove(state, prevSquare, nextSquare, () => {
             let piecesThatCanDiscoverCheck: Piece[] = ['rook', 'bishop', 'queen'];
@@ -152,7 +151,8 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
 }
 
 
-const getAllPiecesAttackingSquare = (state: BoardState, targetSquare: SquareState, pieceMap: Record<Piece, Set<SquareState>>): Piece[] => {
+const getAllPiecesAttackingSquare = (state: BoardState, targetSquare: SquareState, attackingTeam: Team): Piece[] => {
+    const pieceMap = state.teamManager.getPieceMap(attackingTeam);
     const pieces: Piece[] = [];
     let piece: Piece;
     for (piece in pieceMap) {

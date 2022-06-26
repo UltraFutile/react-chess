@@ -30,15 +30,12 @@ export function movePiece (state: BoardState, file: number, rank: number): Board
     }
     
     const nextSquare: SquareState = newState.squareGrid[file][rank];
+    newState.teamManager.removePiece(prevSelectedSquare.piece.team, prevSelectedSquare.piece.piece, prevSelectedSquare);
+    newState.teamManager.addPiece(prevSelectedSquare.piece.team, prevSelectedSquare.piece.piece, nextSquare);
 
-    let pieceMap = prevSelectedSquare.piece.team === Team.White ? newState.whitePieceMap : newState.blackPieceMap;    
-    const pieceSet = pieceMap[prevSelectedSquare.piece.piece];
-    pieceSet.delete(prevSelectedSquare);
-    pieceSet.add(nextSquare);
 
     if (nextSquare.piece) { // remove enemy piece from map
-        let enemyPieceMap = nextSquare.piece.team === Team.Black ? newState.blackPieceMap : newState.whitePieceMap;
-        enemyPieceMap[nextSquare.piece.piece].delete(nextSquare)
+        newState.teamManager.removePiece(nextSquare.piece.team, nextSquare.piece.piece, nextSquare);
     }
 
     // remove piece from previously selected square 

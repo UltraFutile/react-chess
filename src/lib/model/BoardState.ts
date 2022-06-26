@@ -1,5 +1,6 @@
 import { BoardFile, BoardRank, Coordinates } from "../../types/AlgebraicNotation";
 import { Team } from "../Team";
+import { TeamManager } from "./board/TeamManager";
 import { Piece } from "./PieceProps";
 import { SquareState } from "./SquareState";
 
@@ -9,8 +10,7 @@ export interface BoardState {
     squareGrid: SquareState[][];
     currentlySelectedSquare?: SquareState;
     whichTeamsTurn: Team;
-    whitePieceMap: Record<Piece, Set<SquareState>>;
-    blackPieceMap: Record<Piece, Set<SquareState>>;
+    teamManager: TeamManager;
 }
 
 const fileToIndexMap: Record<BoardFile, number> = {
@@ -74,22 +74,7 @@ export class BoardStateFactory {
             rankNum,
             squareGrid,
             whichTeamsTurn: Team.White,
-            whitePieceMap: {
-                king: new Set<SquareState>(),
-                queen: new Set<SquareState>(),
-                bishop: new Set<SquareState>(),
-                knight:new Set<SquareState>(),
-                pawn: new Set<SquareState>(),
-                rook: new Set<SquareState>(),
-            },
-            blackPieceMap: {
-                king: new Set<SquareState>(),
-                queen: new Set<SquareState>(),
-                bishop: new Set<SquareState>(),
-                knight:new Set<SquareState>(),
-                pawn: new Set<SquareState>(),
-                rook: new Set<SquareState>(),
-            }
+            teamManager: new TeamManager()
         }
     }
 
@@ -126,12 +111,7 @@ export class BoardStateFactory {
 
         const setPiece = (square: SquareState, team: Team, piece: Piece) => {
             square.piece = { team, piece };
-            if (team === Team.White) {
-                boardState.whitePieceMap[piece].add(square);
-            }
-            else {
-                boardState.blackPieceMap[piece].add(square);
-            }
+            boardState.teamManager.addPiece(team, piece, square);
         }
 
         // White pieces
