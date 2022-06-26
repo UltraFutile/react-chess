@@ -56,8 +56,10 @@ export function movePiece (state: BoardState, file: number, rank: number): Board
     newState.currentlySelectedSquare = undefined;
     prevSelectedSquare.selected = false;
 
-    // Change whose turn it is
-    newState.whichTeamsTurn = newState.whichTeamsTurn === Team.White ? Team.Black : Team.White;
-    
+
     return newState;
+}
+
+export function changeTurn(state: BoardState) {
+    state.whichTeamsTurn = state.whichTeamsTurn === Team.White ? Team.Black : Team.White;
 }
