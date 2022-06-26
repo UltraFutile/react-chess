@@ -2,14 +2,12 @@ import React from 'react';
 import { BoardState } from "../../lib/model/BoardState";
 import { SquareState } from "../../lib/model/SquareState";
 import { toggleSquareSelect, movePiece, changeTurn } from "./UpdateBoardState";
-import { isLegalBishopMove } from "../../lib/pieces/Bishop";
-import { isLegalKnightMove } from "../../lib/pieces/Knight";
-import { isLegalPawnMove } from "../../lib/pieces/Pawn";
-import { isLegalRookMove } from "../../lib/pieces/Rook";
-import { getKingPossibleMoves, isLegalKingMove } from '../../lib/pieces/King';
+import { getKingPossibleMoves } from '../../lib/pieces/King';
 import { Team } from '../../lib/Team';
 import { destinationHasSameTeam } from '../../lib/pieces/PieceHelpers';
-import { Piece, PieceProps } from '../../lib/model/PieceProps';
+import { Piece } from '../../lib/model/PieceProps';
+import { simulateMove } from './SimulateMove';
+import { getValidationForPiece } from './GetValidationForPiece';
 
 export const onSquareClickFactory = (state: BoardState, setState: React.Dispatch<React.SetStateAction<BoardState>>) => 
     (fileIndex: number, rankIndex: number) => () => {
@@ -154,62 +152,6 @@ const validateMove = (state: BoardState, prevSquare: SquareState | undefined, ne
 }
 
 
-// perform move
-// perform check => fcn()
-// revert move
-const simulateMove = (
-    state: BoardState, 
-    prevSquare: SquareState, 
-    nextSquare: SquareState, 
-    validationFunction: () => boolean): boolean => {
-    if (prevSquare.piece == null) {
-        throw new Error("Attempted to simulate move without a moving piece.")
-    }
-    // Get team of moving piece
-    const currentTeam = prevSquare.piece.team;
-
-    const teamPieceMap = currentTeam === Team.White ? state.whitePieceMap : state.blackPieceMap;
-    const enemyPieceMap = currentTeam === Team.White ? state.blackPieceMap : state.whitePieceMap;
-
-    let capturedPiece: PieceProps | undefined;
-
-    if (nextSquare.piece) {
-        capturedPiece = nextSquare.piece;
-        enemyPieceMap[nextSquare.piece.piece].delete(nextSquare);
-    }
-
-    teamPieceMap[prevSquare.piece.piece].delete(prevSquare);
-    teamPieceMap[prevSquare.piece.piece].add(nextSquare);
-
-    // capture
-    nextSquare.piece = prevSquare.piece; 
-    prevSquare.piece = undefined;
-
-    const result: boolean = validationFunction();
-
-    // revert move
-    prevSquare.piece = nextSquare.piece;
-
-    teamPieceMap[prevSquare.piece.piece].delete(nextSquare);
-    teamPieceMap[prevSquare.piece.piece].add(prevSquare);
-
-    if (capturedPiece) {
-        nextSquare.piece = capturedPiece;
-        enemyPieceMap[nextSquare.piece.piece].add(nextSquare);
-    }
-    else {
-        nextSquare.piece = undefined;
-
-    }
-
-    if (teamPieceMap['king'].size > 1 || enemyPieceMap['king'].size > 1) {
-        console.log("More than one king")
-    }
-
-    return result;
-}
-
-
 const getAllPiecesAttackingSquare = (state: BoardState, targetSquare: SquareState, pieceMap: Record<Piece, Set<SquareState>>): Piece[] => {
     const pieces: Piece[] = [];
     let piece: Piece;
@@ -222,25 +164,4 @@ const getAllPiecesAttackingSquare = (state: BoardState, targetSquare: SquareStat
         }
     }
     return pieces;
-}
-
-
-const getValidationForPiece = (piece: Piece) => {
-    switch(piece) {
-        case 'pawn':
-            return isLegalPawnMove;
-        case 'knight':
-            return isLegalKnightMove;
-        case 'rook':
-            return isLegalRookMove;
-        case 'bishop':
-            return isLegalBishopMove;
-        case 'king':
-            return isLegalKingMove;
-        case 'queen':
-            return (state: BoardState, orig: [number, number], dest: [number, number]) => {
-                return isLegalBishopMove(state, orig, dest)
-                || isLegalRookMove(state, orig, dest);
-            };
-    }
 }
